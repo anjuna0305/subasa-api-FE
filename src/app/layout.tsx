@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SideBar from "@/components/Sidebar";
+import { Box } from "@mui/material";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,8 +27,38 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <SideBar />
-        {children}
+        <Box display={"flex"}>
+          <SideBar />
+          <Box>
+            <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    height: "100vh",
+                    width: "100%",
+                    px: 2,
+                    mx: "auto",
+                  }}
+                >
+                  {/*the subsa logo part*/}
+                  <Box
+                    sx={{
+                      alignItems: "center",
+                      width: "100%",
+                      px: 2,
+                    }}
+                  >
+                    The Subasa
+                  </Box>
+            
+                  {/*the model selection part*/}
+                  
+                </Box>
+            {children}
+          </Box>
+        </Box>
       </body>
     </html>
   );
