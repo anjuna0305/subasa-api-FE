@@ -20,36 +20,11 @@ type Message = {
   role: "user" | "bot";
 };
 
-type Model = {
-  id: number;
-  displayName: string;
-  modelName: string;
-};
-
-const models: Model[] = [
-  {
-    id: 1,
-    displayName: "model 1",
-    modelName: "model1.10",
-  },
-  {
-    id: 2,
-    displayName: "model 2",
-    modelName: "model2.20",
-  },
-  {
-    id: 3,
-    displayName: "model 3",
-    modelName: "model3.30",
-  },
-];
-
 export default function ChatInput() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingAllowed, setTypingAllowed] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [model, setModel] = useState<Model>(models[0]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -76,27 +51,6 @@ export default function ChatInput() {
     setMessage("");
   };
 
-  const handleModelChange = (
-    event:
-      | ChangeEvent<
-          Omit<HTMLInputElement, "value"> & {
-            value: string;
-          },
-          Element
-        >
-      | (Event & {
-          target: {
-            value: string;
-            name: string;
-          };
-        }),
-  ) => {
-    const selectedModel = models.filter(
-      (m) => m.modelName == event.target.value,
-    );
-    setModel(selectedModel[0]);
-  };
-
   return (
     <Box
       sx={{
@@ -104,46 +58,13 @@ export default function ChatInput() {
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
-        height: "100vh",
+        flexGrow: 1,
+        height: "100%",
         width: "100%",
         px: 2,
         mx: "auto",
       }}
     >
-      {/*the subsa logo part*/}
-      <Box
-        sx={{
-          alignItems: "center",
-          width: "100%",
-          px: 2,
-        }}
-      >
-        The Subasa
-      </Box>
-
-      {/*the model selection part*/}
-      <Box
-        sx={{
-          width: "100%",
-          px: 2,
-        }}
-      >
-        <Select
-          variant="standard"
-          disableUnderline
-          labelId="selected-model-label"
-          id="selected-model-id"
-          value={model.modelName}
-          onChange={handleModelChange}
-        >
-          {models.map((m) => (
-            <MenuItem key={m.id} value={m.modelName}>
-              {m.displayName}
-            </MenuItem>
-          ))}
-        </Select>
-      </Box>
-
       {/* messages area */}
       <Box
         display={messages.length == 0 ? "none" : "flex"}
@@ -153,6 +74,8 @@ export default function ChatInput() {
           p: 2,
           flexDirection: "column",
           gap: 2,
+          width: "100%",
+          maxWidth: "900px",
         }}
       >
         {messages.map((msg) => (

@@ -1,51 +1,76 @@
-import { Box, MenuItem, Select } from "@mui/material";
+"use client";
 
-type Model = {
+import { Box, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { ChangeEvent, useState } from "react";
+
+type Service = {
   id: number;
-  displayName: string;
-  modelName: string;
+  serviceDisplayName: string;
+  serviceCodeName: string;
+  path: string;
 };
 
-const models: Model[] = [
+const services: Service[] = [
   {
     id: 1,
-    displayName: "model 1",
-    modelName: "model1.10",
+    serviceDisplayName: "Chatbot",
+    serviceCodeName: "subasa-chatbot",
+    path: "/chat/chatbot",
   },
   {
     id: 2,
-    displayName: "model 2",
-    modelName: "model2.20",
+    serviceDisplayName: "ASR",
+    serviceCodeName: "subasa-asr",
+    path: "/chat/asr",
   },
   {
     id: 3,
-    displayName: "model 3",
-    modelName: "model3.30",
+    serviceDisplayName: "TTS",
+    serviceCodeName: "subasa-tts",
+    path: "/chat/tts",
   },
 ];
 
-export default function ModeSelector() {
+export default function ServiceSelector() {
+  const [service, setModel] = useState<Service>(services[0]);
+  const router = useRouter();
+
+  const handleServiceChange = (event: SelectChangeEvent<String>) => {
+    const selectedModel = services.find(
+      (s) => s.serviceCodeName == event.target.value,
+    );
+    if (!selectedModel) return;
+
+    setModel(selectedModel);
+    if (selectedModel) {
+    }
+    router.push(selectedModel.path);
+  };
+
   return (
-    <Box
-      sx={{
-        width: "100%",
-        px: 2,
-      }}
-    >
-      <Select
-        variant="standard"
-        disableUnderline
-        labelId="selected-model-label"
-        id="selected-model-id"
-        value={model.modelName}
-        onChange={handleModelChange}
+    <div>
+      <Box
+        sx={{
+          width: "100%",
+          px: 2,
+        }}
       >
-        {models.map((m) => (
-          <MenuItem key={m.id} value={m.modelName}>
-            {m.displayName}
-          </MenuItem>
-        ))}
-      </Select>
-    </Box>
+        <Select
+          variant="standard"
+          disableUnderline
+          labelId="selected-service-label"
+          id="selected-service-id"
+          value={service.serviceCodeName}
+          onChange={handleServiceChange}
+        >
+          {services.map((s) => (
+            <MenuItem key={s.id + 100} value={s.serviceCodeName}>
+              {s.serviceDisplayName}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+    </div>
   );
 }
