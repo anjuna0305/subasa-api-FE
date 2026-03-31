@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Maname } from "next/font/google";
 import "./globals.css";
 import SideBar from "@/components/Sidebar";
 import { Box } from "@mui/material";
@@ -16,6 +16,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const maname = Maname({
+  weight: "400",
+  variable: "--font-maname",
+  subsets: ["sinhala"],
+});
+
 export const metadata: Metadata = {
   title: "Subasa Chat App",
   description: "AI solutions provided by Subasa UCSC",
@@ -27,7 +33,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} ${maname.variable}`}
+    >
       <body>
         <AppRouterCacheProvider>
           <Box display={"flex"} sx={{ height: "100vh" }}>
@@ -46,6 +55,7 @@ export default function RootLayout({
                   display: "flex",
                   flexDirection: "column",
                   flexShrink: 0,
+                  position: "absolute",
                 }}
               >
                 {/*the subsa logo part*/}

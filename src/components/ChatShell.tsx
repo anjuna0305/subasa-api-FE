@@ -13,7 +13,11 @@ type Message = {
   role: "user" | "bot";
 };
 
-export default function ChatShell() {
+interface Props {
+  heading?: string;
+}
+
+export default function ChatShell({ heading }: Props) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingAllowed, setTypingAllowed] = useState(true);
@@ -58,6 +62,26 @@ export default function ChatShell() {
         mx: "auto",
       }}
     >
+      {/* headed area */}
+      <Box
+        paddingBottom={messages.length == 0 ? 0 : 5}
+        sx={{
+          paddingBottom: messages.length === 0 ? 0 : 5,
+          alignItems: "center",
+          width: "100%",
+          maxWidth: "900px",
+          px: 2,
+        }}
+      >
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ textAlign: "center", fontFamily: "var(--font-maname)" }}
+        >
+          ශ්‍රී ලංකා ප්‍රජාතාන්ත්‍රික සමාජවාදී ජනරජයේ ආණ්ඩුක්‍රම ව්‍යවස්ථාව
+        </Typography>
+      </Box>
+
       {/* messages area */}
       {messages.length > 0 && (
         <Box

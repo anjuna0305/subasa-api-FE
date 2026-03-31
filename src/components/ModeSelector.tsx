@@ -50,28 +50,26 @@ export default function ServiceSelector() {
   };
 
   return (
-    <div>
-      <Box
-        sx={{
-          width: "100%",
-          px: 2,
-        }}
+    <Box
+      sx={{
+        width: "100%",
+        px: 2,
+      }}
+    >
+      <Select
+        variant="standard"
+        disableUnderline
+        labelId="selected-service-label"
+        id="selected-service-id"
+        value={service.serviceCodeName}
+        onChange={handleServiceChange}
       >
-        <Select
-          variant="standard"
-          disableUnderline
-          labelId="selected-service-label"
-          id="selected-service-id"
-          value={service.serviceCodeName}
-          onChange={handleServiceChange}
-        >
-          {services.map((s) => (
-            <MenuItem key={s.id + 100} value={s.serviceCodeName}>
-              {s.serviceDisplayName}
-            </MenuItem>
-          ))}
-        </Select>
-      </Box>
-    </div>
+        {services.map((s) => (
+          <MenuItem key={s.id + 100} value={s.serviceCodeName}>
+            {s.serviceDisplayName}
+          </MenuItem>
+        ))}
+      </Select>
+    </Box>
   );
 }
