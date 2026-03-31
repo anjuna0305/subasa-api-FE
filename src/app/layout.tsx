@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SideBar from "@/components/Sidebar";
 import { Box } from "@mui/material";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import ModeSelector from "@/components/ModeSelector";
 
 const geistSans = Geist({
@@ -28,51 +29,53 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <Box display={"flex"} sx={{ height: "100vh" }}>
-          <SideBar />
-          <Box
-            sx={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            {/* the subasa logo and model selection section.*/}
+        <AppRouterCacheProvider>
+          <Box display={"flex"} sx={{ height: "100vh" }}>
+            <SideBar />
             <Box
               sx={{
+                width: "100%",
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                flexShrink: 0,
               }}
             >
-              {/*the subsa logo part*/}
+              {/* the subasa logo and model selection section.*/}
               <Box
                 sx={{
-                  alignItems: "center",
-                  width: "100%",
-                  px: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  flexShrink: 0,
                 }}
               >
-                The Subasa
+                {/*the subsa logo part*/}
+                <Box
+                  sx={{
+                    alignItems: "center",
+                    width: "100%",
+                    px: 2,
+                  }}
+                >
+                  The Subasa
+                </Box>
+
+                {/*the model selection part*/}
+                <ModeSelector />
               </Box>
 
-              {/*the model selection part*/}
-              <ModeSelector />
-            </Box>
-
-            {/* the children section (most probably the chat section)*/}
-            <Box
-              sx={{
-                flex: 1,
-                overflow: "auto",
-                minHeight: 0,
-              }}
-            >
-              {children}
+              {/* the children section (most probably the chat section)*/}
+              <Box
+                sx={{
+                  flex: 1,
+                  overflow: "auto",
+                  minHeight: 0,
+                }}
+              >
+                {children}
+              </Box>
             </Box>
           </Box>
-        </Box>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

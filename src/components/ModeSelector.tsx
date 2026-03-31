@@ -1,8 +1,9 @@
 "use client";
 
-import { Box, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { Box } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 
 type Service = {
   id: number;
@@ -36,7 +37,7 @@ export default function ServiceSelector() {
   const [service, setModel] = useState<Service>(services[0]);
   const router = useRouter();
 
-  const handleServiceChange = (event: SelectChangeEvent<String>) => {
+  const handleServiceChange = (event: SelectChangeEvent<string>) => {
     const selectedModel = services.find(
       (s) => s.serviceCodeName == event.target.value,
     );
