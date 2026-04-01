@@ -31,6 +31,12 @@ const services: Service[] = [
     serviceCodeName: "subasa-tts",
     path: "/chat/tts",
   },
+  {
+    id: 4,
+    serviceDisplayName: "Gov-chatbot",
+    serviceCodeName: "goverment-chatbot",
+    path: "/chat/gov-chatbot",
+  },
 ];
 
 export default function ServiceSelector() {
