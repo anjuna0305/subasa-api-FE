@@ -14,7 +14,7 @@ import { Message } from "@/types/message";
 export default function ChatInput() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [typingAllowed, setTypingAllowed] = useState(true);
+  const [typingAllowed] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

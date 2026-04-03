@@ -1,7 +1,6 @@
 "use client";
-import { Box, Button, IconButton, Input } from "@mui/material";
+import { Box, IconButton, Input } from "@mui/material";
 import LiteCard from "./LiteCard";
-import { Label } from "@mui/icons-material";
 import Image from "next/image";
 import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
 import SendIcon from "@mui/icons-material/Send";

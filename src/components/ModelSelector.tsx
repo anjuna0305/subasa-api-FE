@@ -24,7 +24,7 @@ export default function ModelSelector({ model, setModel, modelLoader }: Props) {
       setModelLoading(false);
     };
     loadModels();
-  }, []);
+  }, [modelLoader]);
 
   const handleModelChange = (event: SelectChangeEvent<string>) => {
     const selectedModel = models.find((m) => m.modelCode == event.target.value);
