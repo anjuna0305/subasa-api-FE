@@ -4,13 +4,7 @@ import { Box } from "@mui/material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-type Service = {
-  id: number;
-  serviceDisplayName: string;
-  serviceCodeName: string;
-  path: string;
-};
+import { Service } from "@/types/service";
 
 const services: Service[] = [
   {
@@ -36,6 +30,12 @@ const services: Service[] = [
     serviceDisplayName: "Gov-chatbot",
     serviceCodeName: "goverment-chatbot",
     path: "/chat/gov-chatbot",
+  },
+  {
+    id: 5,
+    serviceDisplayName: "Make your own chatbot",
+    serviceCodeName: "make-chatbot",
+    path: "/chat/make-chatbot",
   },
 ];
 

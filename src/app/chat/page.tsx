@@ -4,21 +4,12 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
+import {VoiceChat} from "@mui/icons-material";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  NativeSelect,
-  Select,
   Typography,
 } from "@mui/material";
-
-type Message = {
-  id: number;
-  text: string;
-  role: "user" | "bot";
-};
+import { Message } from "@/types/message";
 
 export default function ChatInput() {
   const [message, setMessage] = useState("");
@@ -113,6 +104,10 @@ export default function ChatInput() {
           px: 2,
         }}
       >
+        <div>icon gonna be down here</div>
+        <IconButton sx={{ ml: 1 }} color="primary" onClick={handleSend}>
+          <VoiceChat/>
+        </IconButton>
         <TextField
           fullWidth
           multiline
@@ -135,7 +130,7 @@ export default function ChatInput() {
           }}
         />
         {message === "" ? (
-          <div />
+          <div/>
         ) : (
           <IconButton sx={{ ml: 1 }} color="primary" onClick={handleSend}>
             <SendIcon />

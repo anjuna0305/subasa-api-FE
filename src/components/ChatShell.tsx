@@ -1,20 +1,18 @@
 "use client";
 
 import { Box } from "@mui/material";
-import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { Typography } from "@mui/material";
+import LiteCard from "./LiteCard";
+import InvisibleInput from "./InvisibleInput";
+import { Message } from "@/types/message";
+import { VoiceChat } from "@mui/icons-material";
 
-type Message = {
-  id: number;
-  text: string;
-  role: "user" | "bot";
-};
 
 interface Props {
-  heading?: string;
+  heading?: ReactNode;
 }
 
 export default function ChatShell({ heading }: Props) {
@@ -63,24 +61,21 @@ export default function ChatShell({ heading }: Props) {
       }}
     >
       {/* headed area */}
-      <Box
-        paddingBottom={messages.length == 0 ? 0 : 5}
-        sx={{
-          paddingBottom: messages.length === 0 ? 0 : 5,
-          alignItems: "center",
-          width: "100%",
-          maxWidth: "900px",
-          px: 2,
-        }}
-      >
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={{ textAlign: "center", fontFamily: "var(--font-maname)" }}
+      {messages.length == 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            paddingBottom: 3,
+            alignItems: "center",
+            width: "100%",
+            maxWidth: "900px",
+            px: 2,
+          }}
         >
-          ශ්‍රී ලංකා ප්‍රජාතාන්ත්‍රික සමාජවාදී ජනරජයේ ආණ්ඩුක්‍රම ව්‍යවස්ථාව
-        </Typography>
-      </Box>
+          {heading}
+        </Box>
+      )}
 
       {/* messages area */}
       {messages.length > 0 && (
@@ -122,17 +117,16 @@ export default function ChatShell({ heading }: Props) {
       )}
 
       {/*text box part*/}
-      <Box
-        paddingBottom={messages.length == 0 ? 0 : 5}
+      <LiteCard
+        // paddingBottom={5}
         sx={{
-          paddingBottom: messages.length === 0 ? 0 : 5,
           alignItems: "center",
           width: "100%",
           maxWidth: "900px",
           px: 2,
         }}
       >
-        <TextField
+        <InvisibleInput
           fullWidth
           multiline
           maxRows={6}
@@ -145,22 +139,45 @@ export default function ChatShell({ heading }: Props) {
             }
           }}
           placeholder="Message..."
-          variant="outlined"
           disabled={!typingAllowed}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "12px",
-            },
-          }}
         />
-        {message === "" ? (
-          <div />
-        ) : (
-          <IconButton sx={{ ml: 1 }} color="primary" onClick={handleSend}>
-            <SendIcon />
-          </IconButton>
-        )}
-      </Box>
+
+        <Box
+          sx={{
+            height: "3rem",
+            width: "100%",
+            display: "flex",
+            flexDirection: "row-reverse",
+            alignItems: "center",
+          }}
+        >
+          {/* send icon */}
+          <Box
+            sx={{ height: "3rem", display: "flex" }}
+          >
+            {message === "" ? (
+              <IconButton sx={{ ml: 1 }} color="primary" onClick={handleSend}>
+                <VoiceChat/>
+              </IconButton>
+            ) : (
+              <IconButton color="primary" onClick={handleSend}>
+                <SendIcon />
+              </IconButton>
+            )}
+          </Box>
+        </Box>
+        {/*<Box
+          sx={{ height: "3rem", display: "flex" }}
+        >
+          {message === "" ? (
+            <div />
+          ) : (
+            <IconButton color="primary" onClick={handleSend}>
+              <SendIcon />
+            </IconButton>
+          )}
+        </Box>*/}
+      </LiteCard>
     </Box>
   );
 }

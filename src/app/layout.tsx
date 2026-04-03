@@ -4,7 +4,7 @@ import "./globals.css";
 import SideBar from "@/components/Sidebar";
 import { Box } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import ModeSelector from "@/components/ModeSelector";
+import ServiceSelector from "@/components/ServiceSelector";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,7 +70,7 @@ export default function RootLayout({
                 </Box>
 
                 {/*the model selection part*/}
-                <ModeSelector />
+                <ServiceSelector />
               </Box>
 
               {/* the children section (most probably the chat section)*/}
