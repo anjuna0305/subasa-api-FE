@@ -1,12 +1,15 @@
 "use client";
-import { Box, IconButton, Input } from "@mui/material";
+import { Box, IconButton, Input, Typography } from "@mui/material";
 import LiteCard from "./LiteCard";
 import Image from "next/image";
 import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
+import CloseIcon from "@mui/icons-material/Close";
 import ColorBgButton from "./ColorBgButton";
+import TextFilePngImage from "@/../public/text_file.png";
 
 type UploadedFile = {
+  fileName: string;
   file: File | null;
   preview: string | null;
 };
@@ -94,6 +97,7 @@ export default function UploadChatBotFile() {
           const dataFile = fileItems[0].getAsFile();
           if (dataFile) {
             setUploadFile({
+              fileName: dataFile.name,
               file: dataFile,
               preview: generatePreviewForFile(dataFile),
             });
@@ -120,6 +124,7 @@ export default function UploadChatBotFile() {
     const file = files[0];
     if (file.type.startsWith("image/")) {
       setUploadFile({
+        fileName: file.name,
         file: file,
         preview: URL.createObjectURL(file),
       });
@@ -140,12 +145,9 @@ export default function UploadChatBotFile() {
         mx: "auto",
       }}
     >
-      <Box>some random text</Box>
-      
-      <ColorBgButton>this is the button</ColorBgButton>
-      <LiteCard sx={{ width: "600px", height: "200px" }}>
-        this is the lite card
-      </LiteCard>
+      <ColorBgButton onClick={handleInputClick}>
+        this is the button
+      </ColorBgButton>
       <Input
         inputRef={inputRef}
         type="file"
@@ -153,29 +155,66 @@ export default function UploadChatBotFile() {
         sx={{ display: "none" }}
         onChange={handleChangeInputFile}
       />
-      
+
       <LiteCard
-        sx={{ width: "600px", height: "200px", border: "1px solid red" }}
+        sx={{
+          width: "600px",
+          height: "200px",
+          border: "1px solid red",
+          display: "flex",
+          flexDirection: "column",
+          position: "relative",
+        }}
         onDrop={testHandleDrop}
         ref={dropZone}
         onDragOver={handleDragOnDropZone}
-        onClick={handleInputClick}
       >
-        this is the dropdown zone
+        {uploadFile.file ? (
+          <Box
+            sx={{
+              display: "flex",
+              height: "100%",
+              flexDirection: "column-reverse",
+            }}
+          >
+            <Box sx={{ width: "fit-content" }}>
+              <Box sx={{ position: "relative" }}>
+                <IconButton
+                  onClick={removeImage}
+                  sx={{ position: "absolute", top: -16, right: -2 }}
+                >
+                  <CloseIcon />
+                </IconButton>
+                <Image
+                  src={TextFilePngImage}
+                  alt="text_file.png"
+                  style={{ width: "auto", height: "80px" }}
+                />
+              </Box>
+              <Typography>
+                {uploadFile.fileName ? uploadFile.fileName : "random text"}
+              </Typography>
+            </Box>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Typography>this is the dropdown zone</Typography>
+          </Box>
+        )}
+
+        {uploadFile.file && (
+          <Box p={1} sx={{ position: "absolute", bottom: 0, right: 0 }}>
+            <ColorBgButton>this is the send button</ColorBgButton>
+          </Box>
+        )}
       </LiteCard>
-      {uploadFile.preview && (
-        <Box>
-          <Image
-            src={uploadFile.preview}
-            alt="image preview"
-            width={100}
-            height={100}
-          />
-          <IconButton onClick={removeImage}>
-            <SendIcon />
-          </IconButton>
-        </Box>
-      )}
     </Box>
   );
 }
