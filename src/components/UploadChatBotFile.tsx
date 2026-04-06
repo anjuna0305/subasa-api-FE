@@ -4,6 +4,7 @@ import LiteCard from "./LiteCard";
 import Image from "next/image";
 import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
+import ColorBgButton from "./ColorBgButton";
 
 type UploadedFile = {
   file: File | null;
@@ -140,6 +141,8 @@ export default function UploadChatBotFile() {
       }}
     >
       <Box>some random text</Box>
+      
+      <ColorBgButton>this is the button</ColorBgButton>
       <LiteCard sx={{ width: "600px", height: "200px" }}>
         this is the lite card
       </LiteCard>
