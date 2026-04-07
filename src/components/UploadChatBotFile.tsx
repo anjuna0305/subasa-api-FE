@@ -1,5 +1,5 @@
 "use client";
-import { Box, IconButton, Input, Typography } from "@mui/material";
+import { Box, IconButton, Input, Tooltip, Typography } from "@mui/material";
 import LiteCard from "./LiteCard";
 import Image from "next/image";
 import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
@@ -177,11 +177,11 @@ export default function UploadChatBotFile() {
               flexDirection: "column-reverse",
             }}
           >
-            <Box sx={{ width: "fit-content" }}>
+            <Box sx={{ width: "96px" }}>
               <Box sx={{ position: "relative" }}>
                 <IconButton
                   onClick={removeImage}
-                  sx={{ position: "absolute", top: -16, right: -2 }}
+                  sx={{ position: "absolute", top: -20, right: -4 }}
                 >
                   <CloseIcon />
                 </IconButton>
@@ -191,9 +191,18 @@ export default function UploadChatBotFile() {
                   style={{ width: "auto", height: "80px" }}
                 />
               </Box>
-              <Typography>
-                {uploadFile.fileName ? uploadFile.fileName : "random text"}
-              </Typography>
+              <Tooltip title={uploadFile.fileName}>
+                <Typography
+                  sx={{
+                      maxWidth: 200,
+                      maxHeight: 48,
+                      overflow: "hidden",
+                      wordBreak: 'break-word', 
+                    }}
+                >
+                  {uploadFile.fileName ? uploadFile.fileName : "random text"}
+                </Typography>
+              </Tooltip>
             </Box>
           </Box>
         ) : (
