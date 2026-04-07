@@ -1,22 +1,36 @@
 "use client";
 
+import { useCustomMicVAD } from "@/hooks/useCustomMicVad";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { Box, Button, Typography } from "@mui/material";
 import { useMicVAD } from "@ricky0123/vad-react";
+import { MicVAD } from "@ricky0123/vad-web";
 
 export default function Recorder() {
   const { start, stop, cancel, isRecording } = useVoiceRecorder(
     "ws://localhost:8765",
   );
 
-  const vad = useMicVAD({
+  const vad = useCustomMicVAD({
     baseAssetPath: "/vad/", // or whatever you want
     onnxWASMBasePath: "/vad/", // or whatever you want
     onSpeechEnd: (audio) => {
       console.log("User stopped talking");
     },
   });
-  vad.start();
+
+  // const handleStart = () => {
+
+  // }
+  const handleStop = () => {
+    console.log("pausing");
+    vad.destroy();
+  };
+
+  const handleStart = () => {
+    console.log("starting");
+    vad.start();
+  };
 
   return (
     <Box
@@ -31,13 +45,13 @@ export default function Recorder() {
         {isRecording ? "recording" : "not recording"}
       </Typography>
 
-      <Button onClick={start} variant="contained">
+      <Button onClick={handleStart} variant="contained">
         start recording
       </Button>
       <Button onClick={stop} variant="contained" color="secondary">
         stop recording
       </Button>
-      <Button onClick={cancel} variant="contained" color="error">
+      <Button onClick={handleStop} variant="contained" color="error">
         cancel recording
       </Button>
     </Box>
