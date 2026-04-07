@@ -9,7 +9,7 @@ import ColorBgButton from "./ColorBgButton";
 import TextFilePngImage from "@/../public/text_file.png";
 
 type UploadedFile = {
-  fileName: string;
+  fileName: string | null;
   file: File | null;
   preview: string | null;
 };
@@ -109,7 +109,7 @@ export default function UploadChatBotFile() {
 
   const removeImage = () => {
     if (inputRef.current) inputRef.current.value = "";
-    setUploadFile({ file: null, preview: null });
+    setUploadFile({ file: null, preview: null, fileName: null });
   };
 
   const handleInputClick = () => {
@@ -194,11 +194,11 @@ export default function UploadChatBotFile() {
               <Tooltip title={uploadFile.fileName}>
                 <Typography
                   sx={{
-                      maxWidth: 200,
-                      maxHeight: 48,
-                      overflow: "hidden",
-                      wordBreak: 'break-word', 
-                    }}
+                    maxWidth: 200,
+                    maxHeight: 48,
+                    overflow: "hidden",
+                    wordBreak: "break-word",
+                  }}
                 >
                   {uploadFile.fileName ? uploadFile.fileName : "random text"}
                 </Typography>

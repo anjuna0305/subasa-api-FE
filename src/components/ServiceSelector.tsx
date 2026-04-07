@@ -37,6 +37,12 @@ const services: Service[] = [
     serviceCodeName: "make-chatbot",
     path: "/chat/make-chatbot",
   },
+  {
+    id: 6,
+    serviceDisplayName: "Voice stream test",
+    serviceCodeName: "voice-stream",
+    path: "/chat/voice-stream",
+  },
 ];
 
 export default function ServiceSelector() {

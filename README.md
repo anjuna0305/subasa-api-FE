@@ -34,3 +34,6 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+there is package i have used to try voice detection, which seems like not very stable or no the best solution. but im gonna keep that anyway, locking it's version. 
+it may not work on your enviornment saying that it missing some files and not found them. those files are available under the node modules. search and find them, then copy those files into the public/vad directory. because of the risk of license violation issues im not gonna commit them to the git. if you are a future developer, please try to use other alternative available.
