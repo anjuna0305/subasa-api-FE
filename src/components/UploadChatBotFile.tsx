@@ -7,6 +7,8 @@ import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
 import ColorBgButton from "./ColorBgButton";
 import TextFilePngImage from "@/../public/text_file.png";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ColorBgIconButton from "./ColorBgIconButton";
 
 type UploadedFile = {
   fileName: string | null;
@@ -14,7 +16,11 @@ type UploadedFile = {
   preview: string | null;
 };
 
-export default function UploadChatBotFile() {
+interface Props {
+  heading?: ReactNode;
+}
+
+export default function UploadChatBotFile({ heading }: Props) {
   const [uploadFile, setUploadFile] = useState<UploadedFile>({
     file: null,
     preview: null,
@@ -145,9 +151,31 @@ export default function UploadChatBotFile() {
         mx: "auto",
       }}
     >
-      <ColorBgButton onClick={handleInputClick}>
-        this is the button
-      </ColorBgButton>
+      {/* headed area */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          paddingBottom: 3,
+          alignItems: "center",
+          width: "100%",
+          maxWidth: "900px",
+          px: 2,
+        }}
+      >
+        {heading}
+      </Box>
+
+      <Box>
+        <ColorBgButton onClick={handleInputClick}>
+          <Typography>ලේඛනයක් තෝරාගන්න</Typography>
+        </ColorBgButton>
+      </Box>
+
+      <Box p={2}>
+        <Typography>හෝ</Typography>
+      </Box>
+
       <Input
         inputRef={inputRef}
         type="file"
@@ -160,7 +188,6 @@ export default function UploadChatBotFile() {
         sx={{
           width: "600px",
           height: "200px",
-          border: "1px solid red",
           display: "flex",
           flexDirection: "column",
           position: "relative",
@@ -214,14 +241,17 @@ export default function UploadChatBotFile() {
               justifyContent: "center",
             }}
           >
-            <Typography>this is the dropdown zone</Typography>
+            <Typography>ලේඛනයක් ඇද දමන්න</Typography>
           </Box>
         )}
 
         {uploadFile.file && (
           <Box p={1} sx={{ position: "absolute", bottom: 0, right: 0 }}>
-            <ColorBgButton>this is the send button</ColorBgButton>
+            <ColorBgIconButton>
+              <ArrowUpwardIcon />
+            </ColorBgIconButton>
           </Box>
+          // TODO send function should be implemented.
         )}
       </LiteCard>
     </Box>
