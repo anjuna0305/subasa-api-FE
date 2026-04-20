@@ -1,6 +1,6 @@
 "use client";
 
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
@@ -10,10 +10,41 @@ import InvisibleInput from "./InvisibleInput";
 import { Message } from "@/types/message";
 import { VoiceChat } from "@mui/icons-material";
 
-
 interface Props {
   heading?: ReactNode;
 }
+
+const base_url_for_now = "https://subasa.lk/voc-si/api/chatbot/chat";
+
+// const sendMessage = async () => {
+//   const response = await fetch(base_url_for_now, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({ message: "suba udasanak wewa obata" }),
+//   });
+//   if (!response.ok) {
+//     throw new Error(`Response status: ${response.status}`);
+//   }
+//   console.log(response);
+// };
+
+const sendMessage = async () => {
+  const message = "hello";
+  const response = await fetch(base_url_for_now, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message }),
+  });
+  if (!response.ok) {
+    throw new Error(`Response status: ${response.status}`);
+  }
+  const data = await response.json();
+  console.log(data);
+};
 
 export default function ChatShell({ heading }: Props) {
   const [message, setMessage] = useState("");
@@ -60,6 +91,7 @@ export default function ChatShell({ heading }: Props) {
         mx: "auto",
       }}
     >
+      <Button onClick={sendMessage}>this is to send</Button>
       {/* headed area */}
       {messages.length == 0 && (
         <Box
@@ -152,12 +184,10 @@ export default function ChatShell({ heading }: Props) {
           }}
         >
           {/* send icon */}
-          <Box
-            sx={{ height: "3rem", display: "flex" }}
-          >
+          <Box sx={{ height: "3rem", display: "flex" }}>
             {message === "" ? (
               <IconButton sx={{ ml: 1 }} color="primary" onClick={handleSend}>
-                <VoiceChat/>
+                <VoiceChat />
               </IconButton>
             ) : (
               <IconButton color="primary" onClick={handleSend}>

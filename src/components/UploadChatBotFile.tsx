@@ -2,7 +2,15 @@
 import { Box, IconButton, Input, Tooltip, Typography } from "@mui/material";
 import LiteCard from "./LiteCard";
 import Image from "next/image";
-import { ChangeEvent, DragEvent, ReactNode, useEffect, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  DragEvent,
+  ReactNode,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
 import ColorBgButton from "./ColorBgButton";
@@ -167,7 +175,7 @@ export default function UploadChatBotFile({ heading }: Props) {
       </Box>
 
       <Box>
-        <ColorBgButton onClick={handleInputClick}>
+        <ColorBgButton onClick={handleInputClick} disabled={!!uploadFile.file}>
           <Typography>ලේඛනයක් තෝරාගන්න</Typography>
         </ColorBgButton>
       </Box>

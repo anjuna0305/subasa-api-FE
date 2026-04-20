@@ -6,19 +6,19 @@ export default function MakeChatBot() {
   return (
     <>
       <UploadChatBotFile
-      heading={
-        <>
-          <Typography
-            variant="h4"
-            paddingTop={1}
-            gutterBottom
-            paddingBottom={2}
-            sx={{ textAlign: "center", fontFamily: "var(--font-maname)" }}
-          >
-            ඔබේම චැට්බොට් කෙනෙක් නිර්මාණය කරගන්න
-          </Typography>
-        </>
-      }
+        heading={
+          <>
+            <Typography
+              variant="h4"
+              paddingTop={1}
+              gutterBottom
+              paddingBottom={2}
+              sx={{ textAlign: "center", fontFamily: "var(--font-maname)" }}
+            >
+              ඔබේම චැට්බොට් කෙනෙක් නිර්මාණය කරගන්න
+            </Typography>
+          </>
+        }
       />
     </>
   );
