@@ -1,10 +1,23 @@
-import { IconButton } from "@mui/material";
-import { ReactNode } from "react";
+import { IconButton, IconButtonProps, Tooltip } from "@mui/material";
+import { forwardRef, ReactNode } from "react";
 
-interface Props {
-  children: ReactNode;
-}
+const ColorBgIconButton = forwardRef<
+  HTMLButtonElement,
+  IconButtonProps & { tooltip?: string }
+>(({ children, tooltip, ...props }, ref) => {
+  return tooltip ? (
+    <Tooltip title={tooltip}>
+      <IconButton ref={ref} {...props}>
+        {children}
+      </IconButton>
+    </Tooltip>
+  ) : (
+    <IconButton ref={ref} {...props}>
+      {children}
+    </IconButton>
+  );
+});
 
-export default function ColorBgIconButton({ children }: Props) {
-  return <IconButton>{children}</IconButton>;
-}
+ColorBgIconButton.displayName = "ColorBgIconButton"; // 👈
+
+export default ColorBgIconButton;

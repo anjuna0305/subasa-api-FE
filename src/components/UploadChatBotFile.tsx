@@ -2,7 +2,7 @@
 import { Box, IconButton, Input, Tooltip, Typography } from "@mui/material";
 import LiteCard from "./LiteCard";
 import Image from "next/image";
-import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, DragEvent, ReactNode, useEffect, useRef, useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
 import ColorBgButton from "./ColorBgButton";
