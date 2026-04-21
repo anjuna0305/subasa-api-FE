@@ -4,7 +4,6 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import VolumeOffIcon from "@mui/icons-material/VolumeOff";
-import testSound from "@/../public/"
 
 interface AudioPlayerProps {
   audioData: Blob | ArrayBuffer;
@@ -24,7 +23,7 @@ export default function AudioPlayer({ audioData }: AudioPlayerProps) {
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
-  const [audio, setAudio] = useState(null)
+  const [audio, setAudio] = useState(null);
 
   useEffect(() => {
     const blob =
@@ -71,13 +70,23 @@ export default function AudioPlayer({ audioData }: AudioPlayerProps) {
   };
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1, width: "100%", px: 1 }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+        width: "100%",
+        px: 1,
+      }}
+    >
       {/* hidden native audio element */}
       {objectUrl && (
         <audio
           ref={audioRef}
           src={objectUrl}
-          onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime ?? 0)}
+          onTimeUpdate={() =>
+            setCurrentTime(audioRef.current?.currentTime ?? 0)
+          }
           onLoadedMetadata={() => setDuration(audioRef.current?.duration ?? 0)}
           onEnded={() => setIsPlaying(false)}
         />

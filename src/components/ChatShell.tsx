@@ -9,6 +9,7 @@ import LiteCard from "./LiteCard";
 import InvisibleInput from "./InvisibleInput";
 import { Message } from "@/types/message";
 import { VoiceChat } from "@mui/icons-material";
+import MessageBox from "./MessageBox";
 
 interface Props {
   heading?: ReactNode;
@@ -30,20 +31,20 @@ const base_url_for_now = "https://subasa.lk/voc-si/api/chatbot/chat";
 //   console.log(response);
 // };
 
-const sendMessage = async () => {
-  const message = "hello";
+const sendMessage = async (message: string): Promise<string> => {
   const response = await fetch(base_url_for_now, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({ message }),
   });
   if (!response.ok) {
     throw new Error(`Response status: ${response.status}`);
   }
   const data = await response.json();
-  console.log(data);
+  return data.response as string;
 };
 
 export default function ChatShell({ heading }: Props) {
@@ -51,6 +52,7 @@ export default function ChatShell({ heading }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingAllowed, setTypingAllowed] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [isSending, setIsSending] = useState<boolean>(false);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -63,18 +65,35 @@ export default function ChatShell({ heading }: Props) {
     setMessage(event.target.value);
   };
 
-  const handleSend = () => {
-    if (!message.trim()) return;
+  const handleSend = async () => {
+    setIsSending(true);
+    const sendingMessage = message.trim();
+    if (!sendingMessage) return;
     setMessages((prev) => [
       ...prev,
-      { id: Date.now(), text: message, role: "user" },
+      { id: Date.now(), text: sendingMessage, role: "user" },
+    ]);
+    setMessage("");
+
+    try {
+      const response = await sendMessage(sendingMessage);
+      if (response) displayResponse(response);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const displayResponse = (response: string) => {
+    setMessages((prev) => [
+      ...prev,
       {
-        id: Date.now() + 2,
-        text: "this is the message from bot mf",
+        id: Date.now(),
+        text: response,
         role: "bot",
       },
     ]);
-    setMessage("");
   };
 
   return (
@@ -91,7 +110,6 @@ export default function ChatShell({ heading }: Props) {
         mx: "auto",
       }}
     >
-      <Button onClick={sendMessage}>this is to send</Button>
       {/* headed area */}
       {messages.length == 0 && (
         <Box
@@ -123,26 +141,7 @@ export default function ChatShell({ heading }: Props) {
           }}
         >
           {messages.map((msg) => (
-            <Box
-              key={msg.id}
-              sx={{
-                display: "flex",
-                justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-              }}
-            >
-              <Box
-                sx={{
-                  maxWidth: "90%",
-                  px: 2,
-                  py: 1,
-                  borderRadius: 2,
-                  bgcolor: msg.role === "user" ? "primary.main" : "grey.200",
-                  color: msg.role === "user" ? "white" : "text.primary",
-                }}
-              >
-                <Typography>{msg.text}</Typography>
-              </Box>
-            </Box>
+            <MessageBox messageObject={msg} key={msg.id} />
           ))}
           <div ref={bottomRef} />
         </Box>
@@ -190,7 +189,11 @@ export default function ChatShell({ heading }: Props) {
                 <VoiceChat />
               </IconButton>
             ) : (
-              <IconButton color="primary" onClick={handleSend}>
+              <IconButton
+                color="primary"
+                onClick={handleSend}
+                disabled={isSending ? true : false}
+              >
                 <SendIcon />
               </IconButton>
             )}

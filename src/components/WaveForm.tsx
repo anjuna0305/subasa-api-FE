@@ -5,10 +5,10 @@ export default function WaveForm() {
   const [wavesurfer, setWavesurfer] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const onReady = (ws) => {
-    setWavesurfer(ws);
-    setIsPlaying(false);
-  };
+  // const onReady = (ws) => {
+  //   setWavesurfer(ws);
+  //   setIsPlaying(false);
+  // };
 
   // const onPlayPause = () => {
   //   wavesurfer && wavesurfer.playPause();
@@ -20,7 +20,7 @@ export default function WaveForm() {
         height={100}
         waveColor="violet"
         url="/my-server/audio.wav"
-        onReady={onReady}
+        // onReady={onReady}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
       />
