@@ -20,7 +20,6 @@ export default function GovernmentChatbot() {
             sx={{ textAlign: "center", fontFamily: "var(--font-maname)" }}
           >
             ශ්‍රී ලංකා ප්‍රජාතාන්ත්‍රික සමාජවාදී ජනරජයේ ආණ්ඩුක්‍රම ව්‍යවස්ථාව
-            this is the change i have done to test the deployment
           </Typography>
         </>
       }
