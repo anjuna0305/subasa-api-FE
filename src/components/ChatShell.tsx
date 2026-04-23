@@ -110,6 +110,7 @@ export default function ChatShell({ heading }: Props) {
         mx: "auto",
       }}
     >
+      {/*TODO add a rate limiter*/}
       {/* headed area */}
       {messages.length == 0 && (
         <Box
