@@ -1,35 +1,36 @@
 "use client";
 
-import { useCustomMicVAD } from "@/hooks/useCustomMicVad";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { Box, Button, Typography } from "@mui/material";
 import { useMicVAD } from "@ricky0123/vad-react";
-import { MicVAD } from "@ricky0123/vad-web";
 
 export default function Recorder() {
+  // custom webhook to stream audio while recording.
+  // not the most efficient way to do this, but there are no other way i found.
   const { start, stop, cancel, isRecording } = useVoiceRecorder(
     "ws://localhost:8765",
+    useMicVAD({
+      baseAssetPath: "/vad/", // or whatever you want
+      onnxWASMBasePath: "/vad/", // or whatever you want
+      onSpeechEnd: (audio) => {
+        handleStop();
+      },
+      startOnLoad: false,
+    }),
   );
 
-  const vad = useCustomMicVAD({
-    baseAssetPath: "/vad/", // or whatever you want
-    onnxWASMBasePath: "/vad/", // or whatever you want
-    onSpeechEnd: (audio) => {
-      console.log("User stopped talking");
-    },
-  });
+  // speech detector.
 
-  // const handleStart = () => {
-
-  // }
   const handleStop = () => {
-    console.log("pausing");
-    vad.destroy();
+    stop();
   };
 
   const handleStart = () => {
-    console.log("starting");
-    vad.start();
+    start();
+  };
+
+  const handleCancel = () => {
+    cancel();
   };
 
   return (
@@ -48,10 +49,10 @@ export default function Recorder() {
       <Button onClick={handleStart} variant="contained">
         start recording
       </Button>
-      <Button onClick={stop} variant="contained" color="secondary">
+      <Button onClick={handleStop} variant="contained" color="secondary">
         stop recording
       </Button>
-      <Button onClick={handleStop} variant="contained" color="error">
+      <Button onClick={handleCancel} variant="contained" color="error">
         cancel recording
       </Button>
     </Box>

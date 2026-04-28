@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { Message } from "@/types/message";
 import TextDisplayBox from "./TextDisplayBox";
@@ -8,6 +8,11 @@ import ColorBgIconButton from "./ColorBgIconButton";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import MicIcon from "@mui/icons-material/Mic";
 import { HideImage, Mic } from "@mui/icons-material";
+import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import { useCustomMicVAD } from "@/hooks/useCustomMicVad";
+import { useMicVAD } from "@ricky0123/vad-react";
+import SendIcon from "@mui/icons-material/Send";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface Props {
   heading?: ReactNode;
@@ -16,30 +21,36 @@ interface Props {
 export default function AsrShell({ heading }: Props) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+
+  const { start, stop, cancel, isRecording } = useVoiceRecorder(
+    "ws://localhost:8765",
+    useMicVAD({
+      baseAssetPath: "/vad/", // or whatever you want
+      onnxWASMBasePath: "/vad/", // or whatever you want
+      onSpeechEnd: (audio) => {
+        handleSendRecording();
+      },
+      startOnLoad: false,
+    }),
+  );
+
+  const handleSendRecording = () => {
+    stop();
+  };
+
+  const handleStartRecording = () => {
+    start();
+  };
+
+  const handleCancelRecording = () => {
+    cancel();
+  };
+
   const [copied, setCopied] = useState<boolean>(false);
   const [responseMessage, setResponseMessage] = useState<string>(`
     ඇමෙරිකාව සහ ඉරානය අතර තීරණාත්මක සාම සාකච්ඡා අද (10) පාකිස්තානයේ
     මැදිහත් වීමෙන්, පාකිස්තානයේ ඉස්ලාමාබාද් අගනුවරදී පැවැත්වෙයි. සාම
     සාකච්ඡා හේතුවෙන්, ඉස්ලාමාබාද් අගනුවරට විශේෂ ආරක්ෂාවක් යොදා ඇත. විශේෂ
-    රාජ්‍යතාන්ත්‍රික සාකච්ඡා සඳහා පහසුකම් සැලසීම වෙනුවෙන් පාකිස්තා රජය
-    විසින් ඉස්ලාමාබාද් නුවරට දින දෙකක රජයේ නිවාඩුවක් ප්‍රකාශයට පත් කර
-    ඇතැයි ද වාර්තා වේ. සාකච්ඡා පැවැත්වෙන්නේ ඉස්ලාමාබාද් අගනුවර සෙරීනා
-    හෝටලයේය. එය මේවනවිට, පාකිස්තාන රජයේ පාලනය යටතේ පවතී. ආරක්ෂාව තහවුරු
-    කිරීම සඳහා හෝටලයේ දැනට රැඳී සිටින සියලුම අමුත්තන්ට වහාම ඉවත් වන ලෙස
-    ද දැනුම් දී ඇත. හෝටලය අවට කිලෝමීටර් 3 ක කලාපයක් සම්පූර්ණයෙන්ම
-    හුදෙකලා කර ඇති අතර කිසිවකුට එම කලාපයට ප්‍රවේශ වීමට ඉඩ ලැබෙන්නේ නැත.
-    අගනුවර වාහන දැඩි ලෙස සෝදිසි කිරීම්වලට ලක්වන බව ද පැවැසෙයි. හෝටලයට
-    ඉහළින් ගුවන් කලාපය ද වසා දමා ඇත. ඇමෙරිකාව සහ ඉරානය අතර තීරණාත්මක සාම
-    සාකච්ඡා අද (10) පාකිස්තානයේ මැදිහත් වීමෙන්, පාකිස්තානයේ ඉස්ලාමාබාද්
-    අගනුවරදී පැවැත්වෙයි. සාම සාකච්ඡා හේතුවෙන්, ඉස්ලාමාබාද් අගනුවරට විශේෂ
-    ආරක්ෂාවක් යොදා ඇත. විශේෂ රාජ්‍යතාන්ත්‍රික සාකච්ඡා සඳහා පහසුකම්
-    සැලසීම වෙනුවෙන් පාකිස්තා රජය විසින් ඉස්ලාමාබාද් නුවරට දින දෙකක රජයේ
-    නිවාඩුවක් ප්‍රකාශයට පත් කර ඇතැයි ද වාර්තා වේ. සාකච්ඡා පැවැත්වෙන්නේ
-    ඉස්ලාමාබාද් අගනුවර සෙරීනා හෝටලයේය. එය මේවනවිට, පාකිස්තාන රජයේ පාලනය
-    යටතේ පවතී. ආරක්ෂාව තහවුරු කිරීම සඳහා හෝටලයේ දැනට රැඳී සිටින සියලුම
-    අමුත්තන්ට වහාම ඉවත් වන ලෙස ද දැනුම් දී ඇත. හෝටලය අවට කිලෝමීටර් 3 ක
-    කලාපයක් සම්පූර්ණයෙන්ම හුදෙකලා කර ඇති අතර කිසිවකුට එම කලාපයට ප්‍රවේශ
-    වීමට ඉඩ ලැබෙන්නේ නැත. අගනුවර වාහන දැඩි ලෙස සෝදිසි කිරීම්වලට ලක්වන බව
     ද පැවැසෙයි. හෝටලයට ඉහළින් ගුවන් කලාපය ද වසා දමා ඇත.
   `);
   const [typingAllowed, setTypingAllowed] = useState(true);
@@ -108,9 +119,29 @@ export default function AsrShell({ heading }: Props) {
       )}
 
       <Box paddingBottom={2}>
-        <ColorBgIconButton tooltip="Start recording">
-          <Mic />
-        </ColorBgIconButton>
+        {!isRecording ? (
+          <ColorBgIconButton
+            tooltip="Start recording"
+            onClick={handleStartRecording}
+          >
+            <Mic />
+          </ColorBgIconButton>
+        ) : (
+          <>
+            <ColorBgIconButton
+              tooltip="Cancel the recoring"
+              onClick={handleCancelRecording}
+            >
+              <CloseIcon />
+            </ColorBgIconButton>
+            <ColorBgIconButton
+              tooltip="Send the recording"
+              onClick={handleSendRecording}
+            >
+              <SendIcon />
+            </ColorBgIconButton>
+          </>
+        )}
       </Box>
 
       {/*text box part*/}
