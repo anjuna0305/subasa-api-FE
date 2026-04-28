@@ -11,12 +11,12 @@ import {
   useRef,
   useState,
 } from "react";
-import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
 import ColorBgButton from "./ColorBgButton";
 import TextFilePngImage from "@/../public/text_file.png";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ColorBgIconButton from "./ColorBgIconButton";
+import { PercentSharp, UploadFile, UploadRounded } from "@mui/icons-material";
 
 type UploadedFile = {
   fileName: string | null;
@@ -28,11 +28,50 @@ interface Props {
   heading?: ReactNode;
 }
 
+// tes
+
+const API_UPLOAD_URL = `https://subasa.lk/voc-si/api/framework/upload`; // Adjust backend URL
+
+// todo - complete upload file function
+//send function and send state
+const uploadSelectedFile = (file: File) => {
+  return new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append("file", file);
+
+    xhr.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100);
+        console.log("percentage: ", percent);
+        // set progress here
+      }
+    });
+
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve();
+      } else {
+        reject(new Error(`Upload failed: ${xhr.status}`));
+      }
+    });
+
+    xhr.addEventListener("error", () => reject(new Error("Network error")));
+    xhr.addEventListener("abort", () => reject(new Error("Upload aborted")));
+
+    xhr.open("POST", API_UPLOAD_URL);
+    xhr.send(formData);
+  });
+};
+
+const sendFile = () => {};
+
 export default function UploadChatBotFile({ heading }: Props) {
   const [uploadFile, setUploadFile] = useState<UploadedFile>({
     file: null,
     preview: null,
   } as UploadedFile);
+  const [isFileSending, setIsFileSending] = useState<boolean>(false);
   const dropZone = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -78,6 +117,19 @@ export default function UploadChatBotFile({ heading }: Props) {
     };
   }, []);
 
+  const handleUploadFile = async () => {};
+
+  const handleFileSend = () => {
+    console.log("handle file send called");
+    if (uploadFile.file) uploadSelectedFile(uploadFile.file);
+    else console.error("no file is selected");
+    // send the file,
+    // handle the errors
+    // block the send button until file is handled.
+    //
+  };
+
+  const hanldeCancelFileSend = async () => {};
   const generatePreviewForFile = (file: File): string | null => {
     const url = URL.createObjectURL(file);
     return url ? url : null;
@@ -255,7 +307,10 @@ export default function UploadChatBotFile({ heading }: Props) {
 
         {uploadFile.file && (
           <Box p={1} sx={{ position: "absolute", bottom: 0, right: 0 }}>
-            <ColorBgIconButton>
+            <ColorBgIconButton
+              disabled={isFileSending}
+              onClick={handleFileSend}
+            >
               <ArrowUpwardIcon />
             </ColorBgIconButton>
           </Box>
