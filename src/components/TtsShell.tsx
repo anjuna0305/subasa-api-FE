@@ -1,6 +1,6 @@
 "use client";
 
-import { Box } from "@mui/material";
+import { Box, SelectChangeEvent } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import SendIcon from "@mui/icons-material/Send";
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
@@ -10,16 +10,80 @@ import InvisibleInput from "./InvisibleInput";
 import { Message } from "@/types/message";
 import { VoiceChat } from "@mui/icons-material";
 import ColorBgButton from "./ColorBgButton";
+import GenericSelector from "./GenericSelector";
 
 interface Props {
   heading?: ReactNode;
 }
+
+interface Voice {
+  id: string;
+  labelName: string;
+  codeName: string;
+}
+
+interface CharType {
+  id: string;
+  labelName: string;
+  codeName: string;
+}
+
+const getVoices = async (): Promise<Voice[] | null> => {
+  return [
+    {
+      id: "1",
+      labelName: "Male",
+      codeName: "male-001",
+    },
+    {
+      id: "2",
+      labelName: "Female",
+      codeName: "female-001",
+    },
+  ] as Voice[];
+};
+
+const getCharTypes = async (): Promise<CharType[] | null> => {
+  return [
+    {
+      id: "1",
+      labelName: "Sinhala",
+      codeName: "sinhala-001",
+    },
+    {
+      id: "2",
+      labelName: "Roman",
+      codeName: "roman-001",
+    },
+  ] as Voice[];
+};
 
 export default function TtsShell({ heading }: Props) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingAllowed, setTypingAllowed] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [voice, setVoice] = useState<Voice>();
+  const [voiceList, setVoiceList] = useState<Voice[]>([]);
+  const [charType, setCharType] = useState<CharType>();
+  const [charTypeList, setCharTypeList] = useState<CharType[]>([]);
+
+  useEffect(() => {
+    const fetchVoiceList = async () => {
+      const data = await getVoices();
+      if (data) setVoiceList(data);
+      else setVoiceList([] as Voice[]);
+    };
+
+    const fetchCharList = async () => {
+      const data = await getCharTypes();
+      if (data) setCharTypeList(data);
+      else setCharTypeList([] as Voice[]);
+    };
+
+    fetchCharList();
+    fetchVoiceList();
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -147,13 +211,39 @@ export default function TtsShell({ heading }: Props) {
             height: "3rem",
             width: "100%",
             display: "flex",
-            flexDirection: "row-reverse",
             alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
           {/* send icon */}
           <Box sx={{ height: "3rem", display: "flex" }}>
-            <ColorBgButton>කථනයට හරවන්න</ColorBgButton>
+            <GenericSelector<Voice>
+              selected={voice}
+              onSelect={(sV) => {
+                const found = voiceList.find((v) => v.codeName === sV.codeName);
+                if (!found) return;
+                setVoice(found);
+              }}
+              loader={async () => voiceList}
+              getKey={(v: Voice) => v.id}
+              getLabel={(v: Voice) => v.labelName}
+              getValue={(v: Voice) => v.codeName}
+            />
+
+            <GenericSelector<CharType>
+              selected={charType}
+              onSelect={(ct) => {
+                const found = charTypeList.find(
+                  (v) => v.codeName === ct.codeName,
+                );
+                if (!found) return;
+                setCharType(found);
+              }}
+              loader={async () => charTypeList}
+              getKey={(ct: CharType) => ct.id}
+              getLabel={(ct: CharType) => ct.labelName}
+              getValue={(ct: CharType) => ct.codeName}
+            />
             {/*<IconButton
               color="primary"
               onClick={handleSend}
@@ -161,6 +251,9 @@ export default function TtsShell({ heading }: Props) {
             >
               <SendIcon />
             </IconButton>*/}
+          </Box>
+          <Box sx={{ height: "3rem", display: "flex" }}>
+            <ColorBgButton>කථනයට හරවන්න 2</ColorBgButton>
           </Box>
         </Box>
         {/*<Box

@@ -17,6 +17,7 @@ import TextFilePngImage from "@/../public/text_file.png";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ColorBgIconButton from "./ColorBgIconButton";
 import { PercentSharp, UploadFile, UploadRounded } from "@mui/icons-material";
+import Waveform2 from "./WaveForm2";
 
 type UploadedFile = {
   fileName: string | null;

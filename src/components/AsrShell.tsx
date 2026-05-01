@@ -13,6 +13,8 @@ import { useCustomMicVAD } from "@/hooks/useCustomMicVad";
 import { useMicVAD } from "@ricky0123/vad-react";
 import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
+import Waveform2 from "./WaveForm2";
+import AudioWaveform, { AudioWaveformHandle } from "./AudioWaveForm";
 
 interface Props {
   heading?: ReactNode;
@@ -21,6 +23,7 @@ interface Props {
 export default function AsrShell({ heading }: Props) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const audioWaveRef = useRef<AudioWaveformHandle>(null);
 
   const { start, stop, cancel, isRecording } = useVoiceRecorder(
     "ws://localhost:8765",
@@ -35,14 +38,17 @@ export default function AsrShell({ heading }: Props) {
   );
 
   const handleSendRecording = () => {
+    audioWaveRef.current?.stop();
     stop();
   };
 
   const handleStartRecording = () => {
+    audioWaveRef.current?.start();
     start();
   };
 
   const handleCancelRecording = () => {
+    audioWaveRef.current?.stop();
     cancel();
   };
 
@@ -118,30 +124,45 @@ export default function AsrShell({ heading }: Props) {
         </Box>
       )}
 
-      <Box paddingBottom={2}>
-        {!isRecording ? (
-          <ColorBgIconButton
-            tooltip="Start recording"
-            onClick={handleStartRecording}
-          >
-            <Mic />
-          </ColorBgIconButton>
-        ) : (
-          <>
-            <ColorBgIconButton
-              tooltip="Cancel the recoring"
-              onClick={handleCancelRecording}
-            >
-              <CloseIcon />
-            </ColorBgIconButton>
-            <ColorBgIconButton
-              tooltip="Send the recording"
-              onClick={handleSendRecording}
-            >
-              <SendIcon />
-            </ColorBgIconButton>
-          </>
-        )}
+      <Box
+        paddingBottom={2}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 1,
+        }}
+      >
+        <Box>
+          <AudioWaveform ref={audioWaveRef} />
+        </Box>
+        <Box sx={{ width: "80px" }}>
+          {!isRecording ? (
+            <Box>
+              <ColorBgIconButton
+                tooltip="Start recording"
+                onClick={handleStartRecording}
+              >
+                <Mic />
+              </ColorBgIconButton>
+            </Box>
+          ) : (
+            <Box>
+              <ColorBgIconButton
+                tooltip="Cancel the recoring"
+                onClick={handleCancelRecording}
+              >
+                <CloseIcon />
+              </ColorBgIconButton>
+              <ColorBgIconButton
+                tooltip="Send the recording"
+                onClick={handleSendRecording}
+              >
+                <SendIcon />
+              </ColorBgIconButton>
+            </Box>
+          )}
+        </Box>
       </Box>
 
       {/*text box part*/}
