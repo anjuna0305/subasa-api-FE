@@ -12,6 +12,7 @@ interface GenericSelectorProps<T> {
   getLabel: (item: T) => string;
   getValue: (item: T) => string;
   defaultSelect?: T;
+  defaultSelectOption?: boolean;
 }
 
 export default function GenericSelector<T>({
@@ -22,6 +23,7 @@ export default function GenericSelector<T>({
   getLabel,
   getValue,
   defaultSelect,
+  defaultSelectOption,
 }: GenericSelectorProps<T>) {
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +48,11 @@ export default function GenericSelector<T>({
     if (defaultSelect && getKey(defaultSelect)) {
       onSelect(defaultSelect);
     }
-  }, [items, onSelect, getKey, defaultSelect]);
+
+    // if (defaultSelect && onSelect) onSelect(defaultSelect);
+
+    if (defaultSelectOption && items[0]) onSelect(items[0]);
+  }, [items, onSelect, getKey, defaultSelect, defaultSelectOption]);
 
   return (
     <Box sx={{ width: "100%", px: 2 }}>

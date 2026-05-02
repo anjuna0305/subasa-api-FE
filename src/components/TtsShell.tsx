@@ -28,7 +28,7 @@ interface CharType {
   codeName: string;
 }
 
-const getVoices = async (): Promise<Voice[] | null> => {
+const getVoices = async (): Promise<Voice[]> => {
   return [
     {
       id: "1",
@@ -43,7 +43,7 @@ const getVoices = async (): Promise<Voice[] | null> => {
   ] as Voice[];
 };
 
-const getCharTypes = async (): Promise<CharType[] | null> => {
+const getCharTypes = async (): Promise<CharType[]> => {
   return [
     {
       id: "1",
@@ -219,30 +219,23 @@ export default function TtsShell({ heading }: Props) {
           <Box sx={{ height: "3rem", display: "flex" }}>
             <GenericSelector<Voice>
               selected={voice}
-              onSelect={(sV) => {
-                const found = voiceList.find((v) => v.codeName === sV.codeName);
-                if (!found) return;
-                setVoice(found);
-              }}
-              loader={async () => voiceList}
+              onSelect={setVoice}
+              loader={getVoices}
               getKey={(v: Voice) => v.id}
               getLabel={(v: Voice) => v.labelName}
               getValue={(v: Voice) => v.codeName}
+              defaultSelectOption
             />
 
             <GenericSelector<CharType>
               selected={charType}
-              onSelect={(ct) => {
-                const found = charTypeList.find(
-                  (v) => v.codeName === ct.codeName,
-                );
-                if (!found) return;
-                setCharType(found);
-              }}
-              loader={async () => charTypeList}
+              onSelect={setCharType}
+              loader={getCharTypes}
               getKey={(ct: CharType) => ct.id}
               getLabel={(ct: CharType) => ct.labelName}
               getValue={(ct: CharType) => ct.codeName}
+              // defaultSelect={charTypeList[0]}
+              defaultSelectOption
             />
             {/*<IconButton
               color="primary"
