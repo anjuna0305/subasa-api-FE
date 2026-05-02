@@ -3,8 +3,9 @@
 import { Box } from "@mui/material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Service } from "@/types/service";
+import { usePathname } from "next/navigation";
 
 const services: Service[] = [
   {
@@ -46,7 +47,10 @@ const services: Service[] = [
 ];
 
 export default function ServiceSelector() {
-  const [service, setModel] = useState<Service>(services[0]);
+  const pathName = usePathname();
+  const [service, setModel] = useState<Service>(
+    services.find((s) => s.path === pathName) || services[0],
+  );
   const router = useRouter();
 
   const handleServiceChange = (event: SelectChangeEvent<string>) => {
@@ -60,6 +64,18 @@ export default function ServiceSelector() {
     }
     router.push(selectedModel.path);
   };
+
+  // useEffect(() => {
+  //   if (pathName) {
+  //     const selectedModel = services.find((s) => s.path == pathName);
+  //     if (
+  //       selectedModel &&
+  //       selectedModel.serviceCodeName !== service.serviceCodeName
+  //     ) {
+  //       setModel(selectedModel);
+  //     }
+  //   }
+  // }, [pathName]);
 
   return (
     <Box
