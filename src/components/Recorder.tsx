@@ -3,12 +3,13 @@
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { Box, Button, Typography } from "@mui/material";
 import { useMicVAD } from "@ricky0123/vad-react";
+import { API_ENDPOINTS } from "@/utils/api";
 
 export default function Recorder() {
   // custom webhook to stream audio while recording.
   // not the most efficient way to do this, but there are no other way i found.
   const { start, stop, cancel, isRecording } = useVoiceRecorder(
-    "ws://localhost:8765",
+    API_ENDPOINTS.ASR_WS,
     useMicVAD({
       baseAssetPath: "/vad/", // or whatever you want
       onnxWASMBasePath: "/vad/", // or whatever you want

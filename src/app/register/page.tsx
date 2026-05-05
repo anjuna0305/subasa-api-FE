@@ -8,8 +8,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useAlert } from "@/contexts/AlertContext";
 import { RegisterRequest } from "@/types/auth";
-
-const REGISTER_API_URL = "PLACEHOLDER";
+import { API_ENDPOINTS, parseErrorMessage } from "@/utils/api";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -34,7 +33,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormValues) => {
     try {
       const payload: RegisterRequest = { ...data, role: "general_user" };
-      const response = await fetch(REGISTER_API_URL, {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -42,10 +41,11 @@ export default function RegisterPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(
-          errorData?.detail ||
-            `Registration failed with status ${response.status}`,
+        const errorMessage = parseErrorMessage(
+          errorData,
+          `Registration failed with status ${response.status}`,
         );
+        throw new Error(errorMessage);
       }
 
       addAlert("success", "Registration successful! Please sign in.");

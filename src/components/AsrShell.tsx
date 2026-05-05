@@ -10,6 +10,7 @@ import MicIcon from "@mui/icons-material/Mic";
 import { HideImage, Mic } from "@mui/icons-material";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { useCustomMicVAD } from "@/hooks/useCustomMicVad";
+import { API_ENDPOINTS } from "@/utils/api";
 import { useMicVAD } from "@ricky0123/vad-react";
 import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
@@ -26,7 +27,7 @@ export default function AsrShell({ heading }: Props) {
   const audioWaveRef = useRef<AudioWaveformHandle>(null);
 
   const { start, stop, cancel, isRecording } = useVoiceRecorder(
-    "ws://localhost:8765",
+    API_ENDPOINTS.ASR_WS,
     useMicVAD({
       baseAssetPath: "/vad/", // or whatever you want
       onnxWASMBasePath: "/vad/", // or whatever you want

@@ -18,6 +18,7 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ColorBgIconButton from "./ColorBgIconButton";
 import { PercentSharp, UploadFile, UploadRounded } from "@mui/icons-material";
 import Waveform2 from "./WaveForm2";
+import { API_ENDPOINTS } from "@/utils/api";
 
 type UploadedFile = {
   fileName: string | null;
@@ -29,12 +30,6 @@ interface Props {
   heading?: ReactNode;
 }
 
-// tes
-
-const API_UPLOAD_URL = `https://subasa.lk/voc-si/api/framework/upload`; // Adjust backend URL
-
-// todo - complete upload file function
-//send function and send state
 const uploadSelectedFile = (file: File) => {
   return new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -60,7 +55,7 @@ const uploadSelectedFile = (file: File) => {
     xhr.addEventListener("error", () => reject(new Error("Network error")));
     xhr.addEventListener("abort", () => reject(new Error("Upload aborted")));
 
-    xhr.open("POST", API_UPLOAD_URL);
+    xhr.open("POST", API_ENDPOINTS.FRAMEWORK_UPLOAD);
     xhr.send(formData);
   });
 };

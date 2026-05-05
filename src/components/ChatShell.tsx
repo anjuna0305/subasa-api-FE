@@ -10,29 +10,14 @@ import InvisibleInput from "./InvisibleInput";
 import { Message } from "@/types/message";
 import { VoiceChat } from "@mui/icons-material";
 import MessageBox from "./MessageBox";
+import { API_ENDPOINTS } from "@/utils/api";
 
 interface Props {
   heading?: ReactNode;
 }
 
-const base_url_for_now = "https://subasa.lk/voc-si/api/chatbot/chat";
-
-// const sendMessage = async () => {
-//   const response = await fetch(base_url_for_now, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({ message: "suba udasanak wewa obata" }),
-//   });
-//   if (!response.ok) {
-//     throw new Error(`Response status: ${response.status}`);
-//   }
-//   console.log(response);
-// };
-
 const sendMessage = async (message: string): Promise<string> => {
-  const response = await fetch(base_url_for_now, {
+  const response = await fetch(API_ENDPOINTS.CHATBOT_CHAT, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -150,7 +135,6 @@ export default function ChatShell({ heading }: Props) {
 
       {/*text box part*/}
       <LiteCard
-        // paddingBottom={5}
         sx={{
           alignItems: "center",
           width: "100%",
@@ -200,17 +184,6 @@ export default function ChatShell({ heading }: Props) {
             )}
           </Box>
         </Box>
-        {/*<Box
-          sx={{ height: "3rem", display: "flex" }}
-        >
-          {message === "" ? (
-            <div />
-          ) : (
-            <IconButton color="primary" onClick={handleSend}>
-              <SendIcon />
-            </IconButton>
-          )}
-        </Box>*/}
       </LiteCard>
     </Box>
   );

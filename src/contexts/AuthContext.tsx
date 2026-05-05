@@ -2,8 +2,7 @@
 
 import React, { createContext, useContext, useCallback, useMemo } from "react";
 import { LoginRequest, LoginResponse } from "@/types/auth";
-
-const LOGIN_API_URL = "PLACEHOLDER";
+import { API_ENDPOINTS, parseErrorMessage } from "@/utils/api";
 
 type AuthState = {
   accessToken: string | null;
@@ -39,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const login = useCallback(async (credentials: LoginRequest) => {
-    const response = await fetch(LOGIN_API_URL, {
+    const response = await fetch(API_ENDPOINTS.LOGIN, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -48,9 +47,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      throw new Error(
-        errorData?.detail || `Login failed with status ${response.status}`,
+      const errorMessage = parseErrorMessage(
+        errorData,
+        `Login failed with status ${response.status}`,
       );
+      throw new Error(errorMessage);
     }
 
     const data: LoginResponse = await response.json();
