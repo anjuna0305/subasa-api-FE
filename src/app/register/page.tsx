@@ -5,41 +5,56 @@ import ColorBgButton from "@/components/ColorBgButton";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
 import { useAlert } from "@/contexts/AlertContext";
+import { RegisterRequest } from "@/types/auth";
 
-const loginSchema = z.object({
+const REGISTER_API_URL = "PLACEHOLDER";
+
+const registerSchema = z.object({
+  name: z.string().min(1, "Name is required"),
   email: z.email("Enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
-  const { login } = useAuth();
   const { addAlert } = useAlert();
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (data: LoginFormValues) => {
-    setErrorMessage(null);
+  const onSubmit = async (data: RegisterFormValues) => {
     try {
-      await login(data);
-      router.push("/chat/chatbot");
+      const payload: RegisterRequest = { ...data, role: "general_user" };
+      const response = await fetch(REGISTER_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(
+          errorData?.detail ||
+            `Registration failed with status ${response.status}`,
+        );
+      }
+
+      addAlert("success", "Registration successful! Please sign in.");
+      router.push("/login");
     } catch (err) {
       const msg =
-        err instanceof Error ? err.message : "Login failed. Please try again.";
-      setErrorMessage(msg);
+        err instanceof Error
+          ? err.message
+          : "Registration failed. Please try again.";
       addAlert("error", msg);
     }
   };
@@ -70,6 +85,14 @@ export default function LoginPage() {
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               <TextField
                 fullWidth
+                placeholder="Name"
+                error={!!errors.name}
+                helperText={errors.name?.message}
+                {...register("name")}
+              />
+
+              <TextField
+                fullWidth
                 type="email"
                 placeholder="Email"
                 error={!!errors.email}
@@ -86,20 +109,12 @@ export default function LoginPage() {
                 {...register("password")}
               />
 
-              {errorMessage && (
-                <Typography color="error" variant="body2" sx={{ px: 1 }}>
-                  {errorMessage}
-                </Typography>
-              )}
-
               <ColorBgButton
                 type="submit"
                 disabled={isSubmitting}
-                sx={{
-                  width: "100%",
-                }}
+                sx={{ width: "100%" }}
               >
-                {isSubmitting ? "Signing in..." : "Sign in"}
+                {isSubmitting ? "Creating account..." : "Sign up"}
               </ColorBgButton>
             </Box>
           </form>
