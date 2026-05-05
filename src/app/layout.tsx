@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Maname } from "next/font/google";
 import "./globals.css";
-import SideBar from "@/components/Sidebar";
-import { Box } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import ServiceSelector from "@/components/ServiceSelector";
 import ThemeRegistry from "@/components/ThemeRegistry";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,52 +39,7 @@ export default function RootLayout({
       <body>
         <AppRouterCacheProvider>
           <ThemeRegistry>
-            <Box display={"flex"} sx={{ height: "100vh" }}>
-              <SideBar />
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                {/* the subasa logo and model selection section.*/}
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    flexShrink: 0,
-                    position: "absolute",
-                  }}
-                >
-                  {/*the subsa logo part*/}
-                  <Box
-                    sx={{
-                      alignItems: "center",
-                      width: "100%",
-                      px: 2,
-                    }}
-                  >
-                    The Subasa
-                  </Box>
-
-                  {/*the model selection part*/}
-                  <ServiceSelector />
-                </Box>
-
-                {/* the children section (most probably the chat section)*/}
-                <Box
-                  sx={{
-                    flex: 1,
-                    overflow: "auto",
-                    minHeight: 0,
-                  }}
-                >
-                  {children}
-                </Box>
-              </Box>
-            </Box>
+            <AuthProvider>{children}</AuthProvider>
           </ThemeRegistry>
         </AppRouterCacheProvider>
       </body>
