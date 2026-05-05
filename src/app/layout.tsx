@@ -4,6 +4,8 @@ import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import ThemeRegistry from "@/components/ThemeRegistry";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AlertProvider } from "@/contexts/AlertContext";
+import GlobalAlert from "@/components/GlobalAlert";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,7 +41,12 @@ export default function RootLayout({
       <body>
         <AppRouterCacheProvider>
           <ThemeRegistry>
-            <AuthProvider>{children}</AuthProvider>
+            <AlertProvider>
+              <AuthProvider>
+                {children}
+                <GlobalAlert />
+              </AuthProvider>
+            </AlertProvider>
           </ThemeRegistry>
         </AppRouterCacheProvider>
       </body>

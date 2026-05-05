@@ -10,6 +10,7 @@ import { z } from "zod";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAlert } from "@/contexts/AlertContext";
 import { TextFields } from "@mui/icons-material";
 
 const loginSchema = z.object({
@@ -22,6 +23,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
+  const { addAlert } = useAlert();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
@@ -38,9 +40,10 @@ export default function LoginPage() {
       await login(data);
       router.push("/chat/chatbot");
     } catch (err) {
-      setErrorMessage(
-        err instanceof Error ? err.message : "Login failed. Please try again.",
-      );
+      const msg =
+        err instanceof Error ? err.message : "Login failed. Please try again.";
+      setErrorMessage(msg);
+      addAlert("error", msg);
     }
   };
 
