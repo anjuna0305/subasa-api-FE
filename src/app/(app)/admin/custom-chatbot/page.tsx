@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Typography,
@@ -22,23 +23,12 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import UnpublishedIcon from "@mui/icons-material/Unpublished";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import ColorBgButton from "@/components/ColorBgButton";
 import ColorBgIconButton from "@/components/ColorBgIconButton";
-import { API_BASE_URL } from "@/utils/api";
+import { API_ENDPOINTS } from "@/utils/api";
 import { useAlert } from "@/contexts/AlertContext";
-
-type Chatbot = {
-  id: number;
-  chatbot_name: string;
-  file_path: string;
-  description: string;
-  hero_image_path: string;
-  url_path: string;
-  retrieval_key: string;
-  is_publish: boolean;
-  created_at: string;
-};
+import { CustomChatbot } from "@/types/custom-chatbot";
 
 type FormErrors = {
   chatbot_name?: string;
@@ -52,8 +42,9 @@ const INITIAL_FORM = {
   url_path: "",
 };
 
-export default function CustomChatbot() {
-  const [chatbots, setChatbots] = useState<Chatbot[]>([]);
+export default function CustomChatbotListPage() {
+  const router = useRouter();
+  const [chatbots, setChatbots] = useState<CustomChatbot[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -64,7 +55,7 @@ export default function CustomChatbot() {
   const fetchChatbots = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/custom-chatbots`, {
+      const response = await fetch(API_ENDPOINTS.CUSTOM_CHATBOT_LIST, {
         credentials: "include",
       });
       if (!response.ok) {
@@ -106,7 +97,7 @@ export default function CustomChatbot() {
 
     setSubmitting(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/custom-chatbots`, {
+      const response = await fetch(API_ENDPOINTS.CUSTOM_CHATBOT_LIST, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -185,7 +176,14 @@ export default function CustomChatbot() {
             </TableHead>
             <TableBody>
               {chatbots.map((chatbot) => (
-                <TableRow key={chatbot.id}>
+                <TableRow
+                  key={chatbot.id}
+                  hover
+                  sx={{ cursor: "pointer" }}
+                  onClick={() =>
+                    router.push(`/admin/custom-chatbot/${chatbot.id}`)
+                  }
+                >
                   <TableCell>{chatbot.chatbot_name}</TableCell>
                   <TableCell>{chatbot.url_path}</TableCell>
                   <TableCell>
@@ -196,8 +194,8 @@ export default function CustomChatbot() {
                     />
                   </TableCell>
                   <TableCell align="center">
-                    <ColorBgIconButton tooltip="Unpublish" size="small">
-                      <UnpublishedIcon fontSize="small" />
+                    <ColorBgIconButton tooltip="View details" size="small">
+                      <VisibilityIcon fontSize="small" />
                     </ColorBgIconButton>
                   </TableCell>
                 </TableRow>
