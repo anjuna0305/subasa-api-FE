@@ -7,6 +7,12 @@ export const API_ENDPOINTS = {
   CHATBOT_CHAT: `${API_BASE_URL}/voc-si/api/chatbot/chat`,
   FRAMEWORK_UPLOAD: `${API_BASE_URL}/voc-si/api/framework/upload`,
   ASR_WS: WS_BASE_URL,
+  CUSTOM_CHATBOT_BY_URL: (urlPath: string) =>
+    `${API_BASE_URL}/custom-chatbots/by-url-path/${urlPath}`,
+  CUSTOM_CHATBOT_API: (retrievalKey: string) =>
+    `${API_BASE_URL}/custom-chatbots/api/${retrievalKey}`,
+  CUSTOM_CHATBOT_IMAGE: (heroImage: string) =>
+    `${API_BASE_URL}/custom-chatbot/images/${heroImage}`,
 };
 
 export function parseErrorMessage(

@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
@@ -16,6 +16,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { useAuth } from "@/contexts/AuthContext";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 const drawerWidth = 240;
 
@@ -76,7 +78,10 @@ const Drawer = styled(MuiDrawer, {
 
 export default function SideBar() {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const { role } = useAuth();
+  const isMounted = useIsMounted();
+  const isAdmin = isMounted && role === "general_user";
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -87,29 +92,34 @@ export default function SideBar() {
   };
 
   return (
-    <div>
+    <>
       <Box sx={{ display: "flex" }}>
         <Drawer variant="permanent" open={open}>
-          <DrawerHeader>
-            {open === true ? (
-              <IconButton onClick={handleDrawerClose}>
-                {theme.direction === "rtl" ? (
-                  <ChevronRightIcon />
-                ) : (
-                  <ChevronLeftIcon />
-                )}
-              </IconButton>
-            ) : (
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-              >
-                <MenuIcon />
-              </IconButton>
-            )}
-          </DrawerHeader>
+          {/* todo change the logic here*/}
+          {isAdmin ? (
+            <DrawerHeader>
+              {open === true ? (
+                <IconButton onClick={handleDrawerClose}>
+                  {theme.direction === "rtl" ? (
+                    <ChevronRightIcon />
+                  ) : (
+                    <ChevronLeftIcon />
+                  )}
+                </IconButton>
+              ) : (
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={handleDrawerOpen}
+                  edge="start"
+                >
+                  <MenuIcon />
+                </IconButton>
+              )}
+            </DrawerHeader>
+          ) : (
+            <DrawerHeader></DrawerHeader>
+          )}
           <Divider />
 
           <Box
@@ -224,6 +234,6 @@ export default function SideBar() {
           </Box>
         </Drawer>
       </Box>
-    </div>
+    </>
   );
 }

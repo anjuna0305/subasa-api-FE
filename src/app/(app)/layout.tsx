@@ -6,6 +6,7 @@ import ServiceSelector from "@/components/ServiceSelector";
 import AuthGuard from "@/components/AuthGuard";
 import { useAuth } from "@/contexts/AuthContext";
 import { Service } from "@/types/service";
+import { useIsMounted } from "@/hooks/useIsMounted";
 
 const generalServices: Service[] = [
   {
@@ -61,6 +62,9 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   const { role } = useAuth();
+  const isMounted = useIsMounted();
+
+  const isAdmin = role === "admin_user";
   return (
     <AuthGuard>
       <Box display={"flex"} sx={{ height: "100vh" }}>
@@ -92,7 +96,7 @@ export default function AppLayout({
             </Box>
 
             <ServiceSelector
-              services={role == "admin_user" ? generalServices : adminServices}
+              services={!isAdmin ? generalServices : adminServices}
             />
           </Box>
 
