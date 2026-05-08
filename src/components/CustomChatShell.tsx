@@ -2,19 +2,24 @@
 
 import { Box, IconButton, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { VoiceChat } from "@mui/icons-material";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import MicIcon from "@mui/icons-material/Mic";
+import StopIcon from "@mui/icons-material/Stop";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import LiteCard from "./LiteCard";
 import InvisibleInput from "./InvisibleInput";
 import { Message } from "@/types/message";
 import MessageBox from "./MessageBox";
+import AudioWaveform, { AudioWaveformHandle } from "./AudioWaveForm";
 import { API_ENDPOINTS } from "@/utils/api";
 import { CustomChatbot } from "@/types/custom-chatbot";
+import { reencodeAudio } from "@/utils/audio";
 
 interface Props {
   chatbotData: CustomChatbot;
   heroImageUrl: string;
 }
+
+type RecordingState = "idle" | "recording" | "processing";
 
 const sendCustomMessage = async (
   message: string,
@@ -22,9 +27,7 @@ const sendCustomMessage = async (
 ): Promise<string> => {
   const response = await fetch(API_ENDPOINTS.CUSTOM_CHATBOT_API(retrievalKey), {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     credentials: "include",
     body: JSON.stringify({ message }),
   });
@@ -35,56 +38,191 @@ const sendCustomMessage = async (
   return data.response as string;
 };
 
+const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", audioBlob, "audio.wav");
+  const response = await fetch(API_ENDPOINTS.ASR_TRANSCRIBE, {
+    method: "POST",
+    body: formData,
+  });
+  if (!response.ok) {
+    throw new Error(`ASR error: ${response.status}`);
+  }
+  const data = await response.json();
+  return data.transcription as string;
+};
+
+const fetchTtsAudioUrl = async (text: string): Promise<string> => {
+  const payload = {
+    text: text.trim(),
+    speaker: "mettananda",
+    speaker_type: "single",
+    voice: "male",
+    input_type: "sinhala",
+  };
+  const response = await fetch(API_ENDPOINTS.TTS_GENERATE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) {
+    throw new Error(`TTS error: ${response.status}`);
+  }
+  const data = await response.json();
+  return `${API_ENDPOINTS.TTS_GENERATE.replace("/voicebot-generate-audio", "")}${data.audioUrl}?t=${Date.now()}`;
+};
+
 export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [typingAllowed] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [isSending, setIsSending] = useState<boolean>(false);
+  const [isSending, setIsSending] = useState(false);
+  const [recordingState, setRecordingState] = useState<RecordingState>("idle");
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const waveformRef = useRef<AudioWaveformHandle>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const updateMessage = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setMessage(event.target.value);
   };
 
-  const handleSend = async () => {
-    setIsSending(true);
-    const sendingMessage = message.trim();
-    if (!sendingMessage) return;
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now(), text: sendingMessage, role: "user" },
-    ]);
-    setMessage("");
+  const processAndSendText = useCallback(
+    async (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed) return;
 
+      const userMsgId = Date.now();
+      setMessages((prev) => [
+        ...prev,
+        { id: userMsgId, text: trimmed, role: "user" },
+      ]);
+      setMessage("");
+
+      try {
+        setIsSending(true);
+        const botResponse = await sendCustomMessage(
+          trimmed,
+          chatbotData.url_path,
+        );
+
+        const botMsgId = Date.now();
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: botMsgId,
+            text: botResponse,
+            role: "bot",
+            audioLoading: true,
+          },
+        ]);
+
+        try {
+          const audioUrl = await fetchTtsAudioUrl(botResponse);
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === botMsgId ? { ...m, audioUrl, audioLoading: false } : m,
+            ),
+          );
+        } catch {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === botMsgId ? { ...m, audioLoading: false } : m,
+            ),
+          );
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsSending(false);
+      }
+    },
+    [chatbotData.retrieval_key],
+  );
+
+  const handleSend = () => {
+    processAndSendText(message);
+  };
+
+  const handleStartRecording = async () => {
     try {
-      const response = await sendCustomMessage(
-        sendingMessage,
-        chatbotData.retrieval_key,
-      );
-      if (response) displayResponse(response);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      streamRef.current = stream;
+
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: "audio/webm",
+      });
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.start();
+      waveformRef.current?.start();
+      setRecordingState("recording");
     } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSending(false);
+      console.error("Microphone access error:", err);
     }
   };
 
-  const displayResponse = (response: string) => {
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        text: response,
-        role: "bot",
-      },
-    ]);
+  const handleStopRecording = async () => {
+    const recorder = mediaRecorderRef.current;
+    if (!recorder || recorder.state !== "recording") return;
+
+    setRecordingState("processing");
+    waveformRef.current?.stop();
+
+    const pendingChunks = [...audioChunksRef.current];
+
+    await new Promise<void>((resolve) => {
+      recorder.onstop = () => {
+        resolve();
+      };
+      recorder.stop();
+    });
+
+    const combinedChunks = [...pendingChunks, ...audioChunksRef.current];
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+
+    const audioBlob = new Blob(combinedChunks, { type: "audio/webm" });
+
+    try {
+      const wavBlob = await reencodeAudio(audioBlob);
+      const transcription = await transcribeAudio(wavBlob);
+      if (transcription.trim()) {
+        processAndSendText(transcription);
+      }
+    } catch (err) {
+      console.error("ASR error:", err);
+    } finally {
+      setRecordingState("idle");
+    }
   };
+
+  const handleMicClick = () => {
+    if (recordingState === "idle") {
+      handleStartRecording();
+    } else if (recordingState === "recording") {
+      handleStopRecording();
+    }
+  };
+
+  const isInputDisabled =
+    isSending ||
+    recordingState === "recording" ||
+    recordingState === "processing";
 
   return (
     <Box
@@ -156,6 +294,24 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
         </Box>
       )}
 
+      {recordingState === "recording" && (
+        <Box sx={{ width: "100%", maxWidth: "900px", px: 2, mb: 1 }}>
+          <AudioWaveform ref={waveformRef} height={60} />
+        </Box>
+      )}
+
+      {recordingState === "processing" && (
+        <Box sx={{ width: "100%", maxWidth: "900px", px: 2, mb: 1 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ textAlign: "center" }}
+          >
+            Processing...
+          </Typography>
+        </Box>
+      )}
+
       <LiteCard
         sx={{
           alignItems: "center",
@@ -177,7 +333,7 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
             }
           }}
           placeholder="Message..."
-          disabled={!typingAllowed}
+          disabled={isInputDisabled}
         />
 
         <Box
@@ -190,9 +346,22 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
           }}
         >
           <Box sx={{ height: "3rem", display: "flex" }}>
-            {message === "" ? (
-              <IconButton sx={{ ml: 1 }} color="primary" onClick={handleSend}>
-                <VoiceChat />
+            {message === "" && recordingState === "idle" ? (
+              <IconButton
+                sx={{ ml: 1 }}
+                color="primary"
+                onClick={handleMicClick}
+                disabled={isSending}
+              >
+                <MicIcon />
+              </IconButton>
+            ) : recordingState !== "idle" ? (
+              <IconButton
+                color="error"
+                onClick={handleMicClick}
+                disabled={recordingState === "processing"}
+              >
+                <StopIcon />
               </IconButton>
             ) : (
               <IconButton

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
@@ -14,10 +15,16 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { useAuth } from "@/contexts/AuthContext";
-import { useIsMounted } from "@/hooks/useIsMounted";
+import ChatIcon from "@mui/icons-material/Chat";
+import MicIcon from "@mui/icons-material/Mic";
+import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import SmartToyIcon from "@mui/icons-material/SmartToy";
+import StreamIcon from "@mui/icons-material/Stream";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import { Service } from "@/types/service";
 
 const drawerWidth = 240;
 
@@ -47,7 +54,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
@@ -76,57 +82,129 @@ const Drawer = styled(MuiDrawer, {
   ],
 }));
 
-export default function SideBar() {
-  const theme = useTheme();
-  const [open, setOpen] = useState(false);
-  const { role } = useAuth();
-  const isMounted = useIsMounted();
-  const isAdmin = isMounted && role === "general_user";
+const serviceIconMap: Record<string, React.ReactElement> = {
+  "subasa-chatbot": <ChatIcon />,
+  "subasa-asr": <MicIcon />,
+  "subasa-tts": <RecordVoiceOverIcon />,
+  "goverment-chatbot": <AccountBalanceIcon />,
+  "make-chatbot": <SmartToyIcon />,
+  "voice-stream": <StreamIcon />,
+  "admin-dashboard": <DashboardIcon />,
+  "admin-custom-chatbot": <ListAltIcon />,
+};
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+interface SideBarProps {
+  services: Service[];
+  isAdmin: boolean;
+}
+
+export default function SideBar({ services, isAdmin }: SideBarProps) {
+  const theme = useTheme();
+  const [collapsed, setCollapsed] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const open = isAdmin ? true : !collapsed;
+
+  const handleToggle = () => {
+    setCollapsed(!collapsed);
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
+  const isActive = (path: string) => {
+    if (path === "/admin") return pathname === "/admin";
+    return pathname.startsWith(path);
   };
 
   return (
-    <>
-      <Box sx={{ display: "flex" }}>
-        <Drawer variant="permanent" open={open}>
-          {/* todo change the logic here*/}
-          {isAdmin ? (
-            <DrawerHeader>
-              {open === true ? (
-                <IconButton onClick={handleDrawerClose}>
-                  {theme.direction === "rtl" ? (
-                    <ChevronRightIcon />
-                  ) : (
-                    <ChevronLeftIcon />
-                  )}
-                </IconButton>
-              ) : (
-                <IconButton
-                  color="inherit"
-                  aria-label="open drawer"
-                  onClick={handleDrawerOpen}
-                  edge="start"
-                >
-                  <MenuIcon />
-                </IconButton>
-              )}
-            </DrawerHeader>
-          ) : (
-            <DrawerHeader></DrawerHeader>
-          )}
-          <Divider />
+    <Box sx={{ display: "flex" }}>
+      <Drawer variant="permanent" open={open}>
+        {isAdmin ? (
+          <DrawerHeader>
+            <Box
+              sx={{
+                width: "100%",
+                px: 2,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Box sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
+                Subasa Admin
+              </Box>
+            </Box>
+          </DrawerHeader>
+        ) : (
+          <DrawerHeader>
+            {open ? (
+              <IconButton onClick={handleToggle}>
+                {theme.direction === "rtl" ? (
+                  <ChevronRightIcon />
+                ) : (
+                  <ChevronLeftIcon />
+                )}
+              </IconButton>
+            ) : (
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleToggle}
+                edge="start"
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
+          </DrawerHeader>
+        )}
+        <Divider />
 
-          <Box
-            sx={{ display: "flex", flexDirection: "column", height: "100%" }}
-          >
+        <Box
+          sx={{ display: "flex", flexDirection: "column", height: "100%" }}
+        >
+          {isAdmin ? (
             <List>
-              <ListItem key={"Inbox"} disablePadding sx={{ display: "block" }}>
+              {services.map((service) => (
+                <ListItem
+                  key={service.id}
+                  disablePadding
+                  sx={{ display: "block" }}
+                >
+                  <ListItemButton
+                    onClick={() => router.push(service.path)}
+                    sx={[
+                      {
+                        minHeight: 48,
+                        px: 2.5,
+                      },
+                      isActive(service.path)
+                        ? {
+                            backgroundColor: theme.palette.action.selected,
+                            borderRight: `3px solid ${theme.palette.primary.main}`,
+                          }
+                        : {},
+                    ]}
+                  >
+                    <ListItemIcon
+                      sx={[
+                        {
+                          minWidth: 0,
+                          justifyContent: "center",
+                          mr: 3,
+                        },
+                      ]}
+                    >
+                      {serviceIconMap[service.serviceCodeName] || <ChatIcon />}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={service.serviceDisplayName}
+                      sx={{ opacity: 1 }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <List>
+              <ListItem disablePadding sx={{ display: "block" }}>
                 <ListItemButton
                   sx={[
                     {
@@ -134,12 +212,8 @@ export default function SideBar() {
                       px: 2.5,
                     },
                     open
-                      ? {
-                          justifyContent: "initial",
-                        }
-                      : {
-                          justifyContent: "center",
-                        },
+                      ? { justifyContent: "initial" }
+                      : { justifyContent: "center" },
                   ]}
                 >
                   <ListItemIcon
@@ -148,92 +222,56 @@ export default function SideBar() {
                         minWidth: 0,
                         justifyContent: "center",
                       },
-                      open
-                        ? {
-                            mr: 3,
-                          }
-                        : {
-                            mr: "auto",
-                          },
+                      open ? { mr: 3 } : { mr: "auto" },
                     ]}
                   >
-                    <InboxIcon />
+                    <DashboardIcon />
                   </ListItemIcon>
                   <ListItemText
                     primary={"Inbox"}
-                    sx={[
-                      open
-                        ? {
-                            opacity: 1,
-                          }
-                        : {
-                            opacity: 0,
-                          },
-                    ]}
+                    sx={[open ? { opacity: 1 } : { opacity: 0 }]}
                   />
                 </ListItemButton>
               </ListItem>
             </List>
-          </Box>
+          )}
+        </Box>
 
-          <Box sx={{ marginTop: "auto" }}>
-            <Divider />
-            <List>
-              <ListItem
-                key={"settings"}
-                disablePadding
-                sx={{ display: "block" }}
+        <Box sx={{ marginTop: "auto" }}>
+          <Divider />
+          <List>
+            <ListItem disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={[
+                  {
+                    minHeight: 48,
+                    px: 2.5,
+                  },
+                  open
+                    ? { justifyContent: "initial" }
+                    : { justifyContent: "center" },
+                ]}
               >
-                <ListItemButton
+                <ListItemIcon
                   sx={[
                     {
-                      minHeight: 48,
-                      px: 2.5,
+                      minWidth: 0,
+                      justifyContent: "center",
                     },
-                    open
-                      ? {
-                          justifyContent: "initial",
-                        }
-                      : {
-                          justifyContent: "center",
-                        },
+                    open ? { mr: 3 } : { mr: "auto" },
                   ]}
                 >
-                  <ListItemIcon
-                    sx={[
-                      {
-                        minWidth: 0,
-                        justifyContent: "center",
-                      },
-                      open
-                        ? {
-                            mr: 3,
-                          }
-                        : {
-                            mr: "auto",
-                          },
-                    ]}
-                  >
-                    {<SettingsIcon />}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"settings"}
-                    sx={[
-                      open
-                        ? {
-                            opacity: 1,
-                          }
-                        : {
-                            opacity: 0,
-                          },
-                    ]}
-                  />
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </Box>
-        </Drawer>
-      </Box>
-    </>
+                  <SettingsIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={"Settings"}
+                  sx={[open ? { opacity: 1 } : { opacity: 0 }]}
+                />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Box>
+      </Drawer>
+    </Box>
   );
 }

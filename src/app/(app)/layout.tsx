@@ -48,11 +48,18 @@ const generalServices: Service[] = [
 ];
 
 const adminServices: Service[] = [
+  ...generalServices,
   {
-    id: 1,
-    serviceDisplayName: "Chatbot for admins",
-    serviceCodeName: "subasa-chatbot for admins",
+    id: 101,
+    serviceDisplayName: "Dashboard",
+    serviceCodeName: "admin-dashboard",
     path: "/admin",
+  },
+  {
+    id: 102,
+    serviceDisplayName: "Custom Chatbots",
+    serviceCodeName: "admin-custom-chatbot",
+    path: "/admin/custom-chatbot",
   },
 ];
 
@@ -64,11 +71,13 @@ export default function AppLayout({
   const { role } = useAuth();
   const isMounted = useIsMounted();
 
-  const isAdmin = role === "admin_user";
+  const isAdmin = isMounted && role === "admin_user";
+  const services = isAdmin ? adminServices : generalServices;
+
   return (
     <AuthGuard>
       <Box display={"flex"} sx={{ height: "100vh" }}>
-        <SideBar />
+        <SideBar services={services} isAdmin={isAdmin} />
         <Box
           sx={{
             width: "100%",
@@ -77,28 +86,28 @@ export default function AppLayout({
             flexDirection: "column",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              flexShrink: 0,
-              position: "absolute",
-            }}
-          >
+          {!isAdmin && (
             <Box
               sx={{
-                alignItems: "center",
-                width: "100%",
-                px: 2,
+                display: "flex",
+                flexDirection: "column",
+                flexShrink: 0,
+                position: "absolute",
               }}
             >
-              The Subasa
-            </Box>
+              <Box
+                sx={{
+                  alignItems: "center",
+                  width: "100%",
+                  px: 2,
+                }}
+              >
+                The Subasa
+              </Box>
 
-            <ServiceSelector
-              services={!isAdmin ? generalServices : adminServices}
-            />
-          </Box>
+              <ServiceSelector services={generalServices} />
+            </Box>
+          )}
 
           <Box
             sx={{

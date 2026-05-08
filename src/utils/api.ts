@@ -20,10 +20,12 @@ export const API_ENDPOINTS = {
     `${API_BASE_URL}/custom-chatbots/unpublish/${id}`,
   CUSTOM_CHATBOT_BY_URL: (urlPath: string) =>
     `${API_BASE_URL}/custom-chatbots/by-url-path/${urlPath}`,
-  CUSTOM_CHATBOT_API: (retrievalKey: string) =>
-    `${API_BASE_URL}/custom-chatbots/api/${retrievalKey}`,
+  CUSTOM_CHATBOT_API: (urlPath: string) =>
+    `${API_BASE_URL}/custom-chatbots/api/${urlPath}`,
   CUSTOM_CHATBOT_IMAGE: (imageName: string) =>
     `${API_BASE_URL}/custom-chatbots/images/${imageName}`,
+  ASR_TRANSCRIBE: `${API_BASE_URL}/voc-si/api/asr/transcribe`,
+  TTS_GENERATE: `${API_BASE_URL}/voc-si/api/tts/voicebot-generate-audio`,
 };
 
 export function parseErrorMessage(
