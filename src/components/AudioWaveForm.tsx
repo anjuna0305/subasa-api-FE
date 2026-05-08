@@ -34,7 +34,7 @@ const AudioWaveform = forwardRef<AudioWaveformHandle, AudioWaveformProps>(
 
     const audioCtxRef = useRef<AudioContext | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
-    const dataArrRef = useRef<Uint8Array | null>(null);
+    const dataArrRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const rafRef = useRef<number | null>(null);
