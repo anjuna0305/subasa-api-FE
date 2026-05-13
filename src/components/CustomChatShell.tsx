@@ -100,9 +100,12 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
       if (!trimmed) return;
 
       const userMsgId = Date.now();
+      const botMsgId = userMsgId + 10;
+
       setMessages((prev) => [
         ...prev,
         { id: userMsgId, text: trimmed, role: "user" },
+        { id: botMsgId, text: "processing...", role: "bot" },
       ]);
       setMessage("");
 
@@ -112,17 +115,23 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
           trimmed,
           chatbotData.url_path,
         );
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === botMsgId
+              ? { ...m, text: botResponse, audioLoading: false }
+              : m,
+          ),
+        );
 
-        const botMsgId = Date.now();
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: botMsgId,
-            text: botResponse,
-            role: "bot",
-            audioLoading: true,
-          },
-        ]);
+        // setMessages((prev) => [
+        //   ...prev,
+        //   {
+        //     id: botMsgId,
+        //     text: botResponse,
+        //     role: "bot",
+        //     audioLoading: true,
+        //   },
+        // ]);
 
         try {
           const audioUrl = await fetchTtsAudioUrl(botResponse);
