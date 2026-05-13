@@ -7,7 +7,6 @@ import {
   useImperativeHandle,
 } from "react";
 
-const BAR_COUNT = 48;
 const SAMPLE_INTERVAL_MS = 40;
 const TARGET_FPS = 30;
 const FRAME_INTERVAL_MS = 1000 / TARGET_FPS;
@@ -21,14 +20,18 @@ interface AudioWaveformProps {
   width?: string | number;
   height?: number;
   barColor?: string;
+  barCount?: number;
 }
 
 const AudioWaveform = forwardRef<AudioWaveformHandle, AudioWaveformProps>(
-  ({ width = "100%", height = 80, barColor = "#378ADD" }, ref) => {
+  (
+    { width = "100%", height = 80, barColor = "#378ADD", barCount = 48 },
+    ref,
+  ) => {
     const [active, setActive] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const queueRef = useRef<Float32Array>(new Float32Array(BAR_COUNT));
+    const queueRef = useRef<Float32Array>(new Float32Array(barCount));
     const qHeadRef = useRef(0);
     const barsRef = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -43,8 +46,8 @@ const AudioWaveform = forwardRef<AudioWaveformHandle, AudioWaveformProps>(
     const renderBars = useCallback(() => {
       const queue = queueRef.current;
       const qHead = qHeadRef.current;
-      for (let i = 0; i < BAR_COUNT; i++) {
-        const idx = (qHead + i) % BAR_COUNT;
+      for (let i = 0; i < barCount; i++) {
+        const idx = (qHead + i) % barCount;
         const amp = queue[idx];
         const fullH = Math.max(2, Math.round(amp * height));
         const bar = barsRef.current[i];
@@ -84,7 +87,7 @@ const AudioWaveform = forwardRef<AudioWaveformHandle, AudioWaveformProps>(
       }
       const rms = Math.sqrt(sum / dataArr.length);
       queueRef.current[qHeadRef.current] = Math.min(1, rms * 4.5);
-      qHeadRef.current = (qHeadRef.current + 1) % BAR_COUNT;
+      qHeadRef.current = (qHeadRef.current + 1) % barCount;
     }, []);
 
     const start = useCallback(async () => {
@@ -155,7 +158,7 @@ const AudioWaveform = forwardRef<AudioWaveformHandle, AudioWaveformProps>(
               background: "rgba(0,0,0,0.12)",
             }}
           />
-          {Array.from({ length: BAR_COUNT }, (_, i) => (
+          {Array.from({ length: barCount }, (_, i) => (
             <div
               key={i}
               ref={(el) => {

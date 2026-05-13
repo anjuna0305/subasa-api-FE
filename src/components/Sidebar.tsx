@@ -102,7 +102,7 @@ interface SideBarProps {
 
 export default function SideBar({ services }: SideBarProps) {
   const theme = useTheme();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
   const { role, logout, isAuthenticated } = useAuth();
@@ -161,7 +161,7 @@ export default function SideBar({ services }: SideBarProps) {
         <Divider />
 
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-          {isAdmin(role) ? (
+          {
             <List>
               {services.map((service) => (
                 <ListItem
@@ -203,39 +203,7 @@ export default function SideBar({ services }: SideBarProps) {
                 </ListItem>
               ))}
             </List>
-          ) : (
-            <List>
-              <ListItem disablePadding sx={{ display: "block" }}>
-                <ListItemButton
-                  sx={[
-                    {
-                      minHeight: 48,
-                      px: 2.5,
-                    },
-                    open
-                      ? { justifyContent: "initial" }
-                      : { justifyContent: "center" },
-                  ]}
-                >
-                  <ListItemIcon
-                    sx={[
-                      {
-                        minWidth: 0,
-                        justifyContent: "center",
-                      },
-                      open ? { mr: 3 } : { mr: "auto" },
-                    ]}
-                  >
-                    <DashboardIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"Inbox"}
-                    sx={[open ? { opacity: 1 } : { opacity: 0 }]}
-                  />
-                </ListItemButton>
-              </ListItem>
-            </List>
-          )}
+          }
         </Box>
 
         <Box sx={{ marginTop: "auto" }}>

@@ -303,12 +303,6 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
         </Box>
       )}
 
-      {recordingState === "recording" && (
-        <Box sx={{ width: "100%", maxWidth: "900px", px: 2, mb: 1 }}>
-          <AudioWaveform ref={waveformRef} height={60} />
-        </Box>
-      )}
-
       {recordingState === "processing" && (
         <Box sx={{ width: "100%", maxWidth: "900px", px: 2, mb: 1 }}>
           <Typography
@@ -327,6 +321,7 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
           width: "100%",
           maxWidth: "900px",
           px: 2,
+          mb: 2,
         }}
       >
         <InvisibleInput
@@ -355,6 +350,18 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
           }}
         >
           <Box sx={{ height: "3rem", display: "flex" }}>
+            <Box
+              sx={{
+                width: "100%",
+                maxWidth: "900px",
+                px: 2,
+                mb: 1,
+                visibility: recordingState !== "idle" ? "visible" : "hidden",
+              }}
+            >
+              <AudioWaveform ref={waveformRef} height={60} />
+            </Box>
+
             {message === "" && recordingState === "idle" ? (
               <IconButton
                 sx={{ ml: 1 }}

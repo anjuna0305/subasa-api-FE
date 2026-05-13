@@ -1,3 +1,3 @@
 export default function Chatbot() {
-  return <h1>this is the chatbot</h1>;
+  return <h1></h1>;
 }
