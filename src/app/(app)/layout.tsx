@@ -77,7 +77,7 @@ export default function AppLayout({
   return (
     <AuthGuard>
       <Box display={"flex"} sx={{ height: "100vh" }}>
-        <SideBar services={services} isAdmin={admin} />
+        <SideBar services={services} />
         <Box
           sx={{
             width: "100%",

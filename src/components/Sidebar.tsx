@@ -16,6 +16,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import SettingsIcon from "@mui/icons-material/Settings";
+import LogoutIcon from "@mui/icons-material/Logout";
+import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import ChatIcon from "@mui/icons-material/Chat";
 import MicIcon from "@mui/icons-material/Mic";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
@@ -25,6 +27,7 @@ import StreamIcon from "@mui/icons-material/Stream";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import { Service } from "@/types/service";
+import { isAdmin, useAuth } from "@/contexts/AuthContext";
 
 const drawerWidth = 240;
 
@@ -95,16 +98,16 @@ const serviceIconMap: Record<string, React.ReactElement> = {
 
 interface SideBarProps {
   services: Service[];
-  isAdmin: boolean;
 }
 
-export default function SideBar({ services, isAdmin }: SideBarProps) {
+export default function SideBar({ services }: SideBarProps) {
   const theme = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { role, logout, isAuthenticated } = useAuth();
 
-  const open = isAdmin ? true : !collapsed;
+  const open = isAdmin(role) ? true : !collapsed;
 
   const handleToggle = () => {
     setCollapsed(!collapsed);
@@ -118,7 +121,7 @@ export default function SideBar({ services, isAdmin }: SideBarProps) {
   return (
     <Box sx={{ display: "flex" }}>
       <Drawer variant="permanent" open={open}>
-        {isAdmin ? (
+        {isAdmin(role) ? (
           <DrawerHeader>
             <Box
               sx={{
@@ -157,10 +160,8 @@ export default function SideBar({ services, isAdmin }: SideBarProps) {
         )}
         <Divider />
 
-        <Box
-          sx={{ display: "flex", flexDirection: "column", height: "100%" }}
-        >
-          {isAdmin ? (
+        <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+          {isAdmin(role) ? (
             <List>
               {services.map((service) => (
                 <ListItem
@@ -268,6 +269,66 @@ export default function SideBar({ services, isAdmin }: SideBarProps) {
                   sx={[open ? { opacity: 1 } : { opacity: 0 }]}
                 />
               </ListItemButton>
+
+              {isAuthenticated ? (
+                <ListItemButton
+                  sx={[
+                    {
+                      minHeight: 48,
+                      px: 2.5,
+                    },
+                    open
+                      ? { justifyContent: "initial" }
+                      : { justifyContent: "center" },
+                  ]}
+                  onClick={logout}
+                >
+                  <ListItemIcon
+                    sx={[
+                      {
+                        minWidth: 0,
+                        justifyContent: "center",
+                      },
+                      open ? { mr: 3 } : { mr: "auto" },
+                    ]}
+                  >
+                    <LogoutIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={"Log out"}
+                    sx={[open ? { opacity: 1 } : { opacity: 0 }]}
+                  />
+                </ListItemButton>
+              ) : (
+                <ListItemButton
+                  sx={[
+                    {
+                      minHeight: 48,
+                      px: 2.5,
+                    },
+                    open
+                      ? { justifyContent: "initial" }
+                      : { justifyContent: "center" },
+                  ]}
+                  onClick={logout}
+                >
+                  <ListItemIcon
+                    sx={[
+                      {
+                        minWidth: 0,
+                        justifyContent: "center",
+                      },
+                      open ? { mr: 3 } : { mr: "auto" },
+                    ]}
+                  >
+                    <AppRegistrationIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={"Log out"}
+                    sx={[open ? { opacity: 1 } : { opacity: 0 }]}
+                  />
+                </ListItemButton>
+              )}
             </ListItem>
           </List>
         </Box>

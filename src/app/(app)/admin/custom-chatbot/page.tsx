@@ -115,7 +115,9 @@ export default function CustomChatbotListPage() {
       setDialogOpen(false);
       setForm(INITIAL_FORM);
       setErrors({});
-      await fetchChatbots();
+      const data: CustomChatbot = await response.json();
+      router.push(`custom-chatbot/${data.id}`);
+      // await fetchChatbots();
     } catch {
       addAlert("error", "Failed to create chatbot");
     } finally {
