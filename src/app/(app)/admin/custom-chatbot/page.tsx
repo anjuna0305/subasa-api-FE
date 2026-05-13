@@ -29,6 +29,7 @@ import ColorBgIconButton from "@/components/ColorBgIconButton";
 import { API_ENDPOINTS } from "@/utils/api";
 import { useAlert } from "@/contexts/AlertContext";
 import { CustomChatbot } from "@/types/custom-chatbot";
+import AdminGuard from "@/components/AdminGuard";
 
 type FormErrors = {
   chatbot_name?: string;
@@ -130,134 +131,136 @@ export default function CustomChatbotListPage() {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 3,
-        }}
-      >
-        <Typography variant="h5" fontWeight={600}>
-          Custom chat bots
-        </Typography>
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <ColorBgIconButton
-            tooltip="Refresh"
-            size="small"
-            onClick={fetchChatbots}
-          >
-            <RefreshIcon fontSize="small" />
-          </ColorBgIconButton>
-          <ColorBgButton
-            startIcon={<AddIcon />}
-            onClick={() => setDialogOpen(true)}
-          >
-            Add new chatbot
-          </ColorBgButton>
+    <AdminGuard>
+      <Box sx={{ p: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 3,
+          }}
+        >
+          <Typography variant="h5" fontWeight={600}>
+            Custom chat bots
+          </Typography>
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <ColorBgIconButton
+              tooltip="Refresh"
+              size="small"
+              onClick={fetchChatbots}
+            >
+              <RefreshIcon fontSize="small" />
+            </ColorBgIconButton>
+            <ColorBgButton
+              startIcon={<AddIcon />}
+              onClick={() => setDialogOpen(true)}
+            >
+              Add new chatbot
+            </ColorBgButton>
+          </Box>
         </Box>
-      </Box>
 
-      {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>URL Path</TableCell>
-                <TableCell>Published</TableCell>
-                <TableCell align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {chatbots.map((chatbot) => (
-                <TableRow
-                  key={chatbot.id}
-                  hover
-                  sx={{ cursor: "pointer" }}
-                  onClick={() =>
-                    router.push(`/admin/custom-chatbot/${chatbot.id}`)
-                  }
-                >
-                  <TableCell>{chatbot.chatbot_name}</TableCell>
-                  <TableCell>{chatbot.url_path}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={chatbot.is_publish ? "Published" : "Unpublished"}
-                      color={chatbot.is_publish ? "success" : "default"}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell align="center">
-                    <ColorBgIconButton tooltip="View details" size="small">
-                      <VisibilityIcon fontSize="small" />
-                    </ColorBgIconButton>
-                  </TableCell>
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>URL Path</TableCell>
+                  <TableCell>Published</TableCell>
+                  <TableCell align="center">Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+              </TableHead>
+              <TableBody>
+                {chatbots.map((chatbot) => (
+                  <TableRow
+                    key={chatbot.id}
+                    hover
+                    sx={{ cursor: "pointer" }}
+                    onClick={() =>
+                      router.push(`/admin/custom-chatbot/${chatbot.id}`)
+                    }
+                  >
+                    <TableCell>{chatbot.chatbot_name}</TableCell>
+                    <TableCell>{chatbot.url_path}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={chatbot.is_publish ? "Published" : "Unpublished"}
+                        color={chatbot.is_publish ? "success" : "default"}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <ColorBgIconButton tooltip="View details" size="small">
+                        <VisibilityIcon fontSize="small" />
+                      </ColorBgIconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
 
-      <Dialog
-        open={dialogOpen}
-        onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Add new chatbot</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField
-              label="Chatbot Name"
-              value={form.chatbot_name}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, chatbot_name: e.target.value }))
-              }
-              error={!!errors.chatbot_name}
-              helperText={errors.chatbot_name}
-              fullWidth
-            />
-            <TextField
-              label="Description"
-              value={form.description}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, description: e.target.value }))
-              }
-              error={!!errors.description}
-              helperText={errors.description}
-              fullWidth
-              multiline
-              rows={3}
-            />
-            <TextField
-              label="URL Path"
-              placeholder="e.g. helpdesk-bot"
-              value={form.url_path}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, url_path: e.target.value }))
-              }
-              error={!!errors.url_path}
-              helperText={errors.url_path}
-              fullWidth
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <ColorBgButton onClick={handleCloseDialog} disabled={submitting}>
-            Cancel
-          </ColorBgButton>
-          <ColorBgButton onClick={handleSubmit} disabled={submitting}>
-            {submitting ? "Creating..." : "Create"}
-          </ColorBgButton>
-        </DialogActions>
-      </Dialog>
-    </Box>
+        <Dialog
+          open={dialogOpen}
+          onClose={handleCloseDialog}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>Add new chatbot</DialogTitle>
+          <DialogContent>
+            <Stack spacing={2} sx={{ mt: 1 }}>
+              <TextField
+                label="Chatbot Name"
+                value={form.chatbot_name}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, chatbot_name: e.target.value }))
+                }
+                error={!!errors.chatbot_name}
+                helperText={errors.chatbot_name}
+                fullWidth
+              />
+              <TextField
+                label="Description"
+                value={form.description}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, description: e.target.value }))
+                }
+                error={!!errors.description}
+                helperText={errors.description}
+                fullWidth
+                multiline
+                rows={3}
+              />
+              <TextField
+                label="URL Path"
+                placeholder="e.g. helpdesk-bot"
+                value={form.url_path}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, url_path: e.target.value }))
+                }
+                error={!!errors.url_path}
+                helperText={errors.url_path}
+                fullWidth
+              />
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <ColorBgButton onClick={handleCloseDialog} disabled={submitting}>
+              Cancel
+            </ColorBgButton>
+            <ColorBgButton onClick={handleSubmit} disabled={submitting}>
+              {submitting ? "Creating..." : "Create"}
+            </ColorBgButton>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </AdminGuard>
   );
 }

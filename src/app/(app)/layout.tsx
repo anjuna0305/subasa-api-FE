@@ -4,7 +4,7 @@ import SideBar from "@/components/Sidebar";
 import { Box } from "@mui/material";
 import ServiceSelector from "@/components/ServiceSelector";
 import AuthGuard from "@/components/AuthGuard";
-import { useAuth } from "@/contexts/AuthContext";
+import { isAdmin, useAuth } from "@/contexts/AuthContext";
 import { Service } from "@/types/service";
 import { useIsMounted } from "@/hooks/useIsMounted";
 
@@ -71,13 +71,13 @@ export default function AppLayout({
   const { role } = useAuth();
   const isMounted = useIsMounted();
 
-  const isAdmin = isMounted && role === "admin_user";
-  const services = isAdmin ? adminServices : generalServices;
+  const admin = isAdmin(role);
+  const services = admin ? adminServices : generalServices;
 
   return (
     <AuthGuard>
       <Box display={"flex"} sx={{ height: "100vh" }}>
-        <SideBar services={services} isAdmin={isAdmin} />
+        <SideBar services={services} isAdmin={admin} />
         <Box
           sx={{
             width: "100%",

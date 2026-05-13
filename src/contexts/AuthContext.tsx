@@ -33,9 +33,8 @@ function getInitialAuthState(): AuthState {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [authState, setAuthState] = React.useState<AuthState>(
-    getInitialAuthState,
-  );
+  const [authState, setAuthState] =
+    React.useState<AuthState>(getInitialAuthState);
 
   const login = useCallback(async (credentials: LoginRequest) => {
     const response = await fetch(API_ENDPOINTS.LOGIN, {
@@ -86,4 +85,8 @@ export function useAuth(): AuthContextType {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+}
+
+export function isAdmin(role: string | null) {
+  return role === "admin_user";
 }

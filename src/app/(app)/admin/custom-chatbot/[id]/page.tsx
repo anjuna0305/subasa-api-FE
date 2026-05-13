@@ -18,6 +18,7 @@ import ColorBgIconButton from "@/components/ColorBgIconButton";
 import { API_ENDPOINTS } from "@/utils/api";
 import { useAlert } from "@/contexts/AlertContext";
 import { CustomChatbot } from "@/types/custom-chatbot";
+import AdminGuard from "@/components/AdminGuard";
 
 export default function CustomChatbotDetailPage() {
   const router = useRouter();
@@ -194,241 +195,245 @@ export default function CustomChatbotDetailPage() {
   }
 
   return (
-    <Box sx={{ p: 3, maxWidth: "800px", mx: "auto" }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-        <ColorBgIconButton
-          tooltip="Back to list"
-          onClick={() => router.push("/admin/custom-chatbot")}
-        >
-          <ArrowBackIcon />
-        </ColorBgIconButton>
-        <Typography variant="h5" fontWeight={600} sx={{ ml: 1 }}>
-          Chatbot Details
-        </Typography>
-      </Box>
-
-      <Stack spacing={3}>
-        <Paper sx={{ p: 3 }}>
-          <Stack spacing={2}>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Name
-              </Typography>
-              <Typography variant="h6">{chatbot.chatbot_name}</Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Description
-              </Typography>
-              <Typography>{chatbot.description}</Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                URL Path
-              </Typography>
-              <Typography>
-                <Typography
-                  component="a"
-                  href={`/chat/${chatbot.url_path}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    color: "primary.main",
-                    textDecoration: "none",
-                    cursor: "pointer",
-                    "&:hover": { textDecoration: "underline" },
-                  }}
-                >
-                  /chat/{chatbot.url_path}
-                </Typography>
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Retrieval Key
-              </Typography>
-              <Typography sx={{ fontFamily: "monospace", fontSize: "0.85rem" }}>
-                {chatbot.retrieval_key}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-              }}
-            >
-              <Typography variant="caption" color="text.secondary">
-                Status
-              </Typography>
-              <Chip
-                label={chatbot.is_publish ? "Published" : "Unpublished"}
-                color={chatbot.is_publish ? "success" : "default"}
-                size="small"
-              />
-              <ColorBgButton
-                size="small"
-                onClick={handleTogglePublish}
-                disabled={togglingPublish}
-                variant="contained"
-                color={chatbot.is_publish ? "warning" : "success"}
-                sx={{ ml: 1 }}
-              >
-                {togglingPublish
-                  ? "Updating..."
-                  : chatbot.is_publish
-                    ? "Unpublish"
-                    : "Publish"}
-              </ColorBgButton>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Created
-              </Typography>
-              <Typography>
-                {new Date(chatbot.created_at).toLocaleString()}
-              </Typography>
-            </Box>
-          </Stack>
-        </Paper>
-
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-            Hero Image
-          </Typography>
-
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 3,
-              flexWrap: "wrap",
-            }}
+    <AdminGuard>
+      <Box sx={{ p: 3, maxWidth: "800px", mx: "auto" }}>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+          <ColorBgIconButton
+            tooltip="Back to list"
+            onClick={() => router.push("/admin/custom-chatbot")}
           >
-            <Box
-              component="img"
-              src={preview || heroImageSrc || ""}
-              alt={chatbot.chatbot_name}
-              sx={{
-                width: 160,
-                height: 160,
-                objectFit: "cover",
-                borderRadius: 2,
-                bgcolor: "grey.100",
-                display: preview || heroImageSrc ? "block" : "none",
-              }}
-            />
+            <ArrowBackIcon />
+          </ColorBgIconButton>
+          <Typography variant="h5" fontWeight={600} sx={{ ml: 1 }}>
+            Chatbot Details
+          </Typography>
+        </Box>
 
-            {!(preview || heroImageSrc) && (
-              <Box
-                sx={{
-                  width: 160,
-                  height: 160,
-                  borderRadius: 2,
-                  bgcolor: "grey.100",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+        <Stack spacing={3}>
+          <Paper sx={{ p: 3 }}>
+            <Stack spacing={2}>
+              <Box>
                 <Typography variant="caption" color="text.secondary">
-                  No image
+                  Name
+                </Typography>
+                <Typography variant="h6">{chatbot.chatbot_name}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Description
+                </Typography>
+                <Typography>{chatbot.description}</Typography>
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  URL Path
+                </Typography>
+                <Typography>
+                  <Typography
+                    component="a"
+                    href={`/chat/${chatbot.url_path}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      color: "primary.main",
+                      textDecoration: "none",
+                      cursor: "pointer",
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    /chat/{chatbot.url_path}
+                  </Typography>
                 </Typography>
               </Box>
-            )}
-
-            <Stack spacing={1}>
-              <Input
-                inputRef={fileInputRef}
-                type="file"
-                onChange={handleFileChange}
-                sx={{ display: "none" }}
-                inputProps={{ accept: "image/*" }}
-              />
-              <ColorBgButton
-                startIcon={<CloudUploadIcon />}
-                onClick={handleFileSelect}
-                disabled={uploading}
-              >
-                Select Image
-              </ColorBgButton>
-              {selectedFile && (
-                <ColorBgButton
-                  onClick={handleUpload}
-                  disabled={uploading}
-                  variant="contained"
-                  color="primary"
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Retrieval Key
+                </Typography>
+                <Typography
+                  sx={{ fontFamily: "monospace", fontSize: "0.85rem" }}
                 >
-                  {uploading ? "Uploading..." : "Upload"}
-                </ColorBgButton>
-              )}
-            </Stack>
-          </Box>
-        </Paper>
-
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-            Knowledge Base File
-          </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Upload a .txt or .pdf file for the chatbot knowledge base.
-          </Typography>
-
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 3,
-              flexWrap: "wrap",
-            }}
-          >
-            {selectedDoc && (
-              <Paper
-                variant="outlined"
+                  {chatbot.retrieval_key}
+                </Typography>
+              </Box>
+              <Box
                 sx={{
-                  px: 2,
-                  py: 1,
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
                 }}
               >
-                <Typography variant="body2">{selectedDoc.name}</Typography>
                 <Typography variant="caption" color="text.secondary">
-                  ({(selectedDoc.size / 1024).toFixed(1)} KB)
+                  Status
                 </Typography>
-              </Paper>
-            )}
-
-            <Stack spacing={1}>
-              <Input
-                inputRef={docInputRef}
-                type="file"
-                onChange={handleDocChange}
-                sx={{ display: "none" }}
-                inputProps={{ accept: ".txt,.pdf" }}
-              />
-              <ColorBgButton
-                startIcon={<CloudUploadIcon />}
-                onClick={handleDocSelect}
-                disabled={uploadingDoc}
-              >
-                Select File
-              </ColorBgButton>
-              {selectedDoc && (
+                <Chip
+                  label={chatbot.is_publish ? "Published" : "Unpublished"}
+                  color={chatbot.is_publish ? "success" : "default"}
+                  size="small"
+                />
                 <ColorBgButton
-                  onClick={handleDocUpload}
-                  disabled={uploadingDoc}
+                  size="small"
+                  onClick={handleTogglePublish}
+                  disabled={togglingPublish}
                   variant="contained"
-                  color="primary"
+                  color={chatbot.is_publish ? "warning" : "success"}
+                  sx={{ ml: 1 }}
                 >
-                  {uploadingDoc ? "Uploading..." : "Upload"}
+                  {togglingPublish
+                    ? "Updating..."
+                    : chatbot.is_publish
+                      ? "Unpublish"
+                      : "Publish"}
                 </ColorBgButton>
-              )}
+              </Box>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Created
+                </Typography>
+                <Typography>
+                  {new Date(chatbot.created_at).toLocaleString()}
+                </Typography>
+              </Box>
             </Stack>
-          </Box>
-        </Paper>
-      </Stack>
-    </Box>
+          </Paper>
+
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+              Hero Image
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 3,
+                flexWrap: "wrap",
+              }}
+            >
+              <Box
+                component="img"
+                src={preview || heroImageSrc || ""}
+                alt={chatbot.chatbot_name}
+                sx={{
+                  width: 160,
+                  height: 160,
+                  objectFit: "cover",
+                  borderRadius: 2,
+                  bgcolor: "grey.100",
+                  display: preview || heroImageSrc ? "block" : "none",
+                }}
+              />
+
+              {!(preview || heroImageSrc) && (
+                <Box
+                  sx={{
+                    width: 160,
+                    height: 160,
+                    borderRadius: 2,
+                    bgcolor: "grey.100",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Typography variant="caption" color="text.secondary">
+                    No image
+                  </Typography>
+                </Box>
+              )}
+
+              <Stack spacing={1}>
+                <Input
+                  inputRef={fileInputRef}
+                  type="file"
+                  onChange={handleFileChange}
+                  sx={{ display: "none" }}
+                  inputProps={{ accept: "image/*" }}
+                />
+                <ColorBgButton
+                  startIcon={<CloudUploadIcon />}
+                  onClick={handleFileSelect}
+                  disabled={uploading}
+                >
+                  Select Image
+                </ColorBgButton>
+                {selectedFile && (
+                  <ColorBgButton
+                    onClick={handleUpload}
+                    disabled={uploading}
+                    variant="contained"
+                    color="primary"
+                  >
+                    {uploading ? "Uploading..." : "Upload"}
+                  </ColorBgButton>
+                )}
+              </Stack>
+            </Box>
+          </Paper>
+
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+              Knowledge Base File
+            </Typography>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Upload a .txt or .pdf file for the chatbot knowledge base.
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 3,
+                flexWrap: "wrap",
+              }}
+            >
+              {selectedDoc && (
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    px: 2,
+                    py: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <Typography variant="body2">{selectedDoc.name}</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    ({(selectedDoc.size / 1024).toFixed(1)} KB)
+                  </Typography>
+                </Paper>
+              )}
+
+              <Stack spacing={1}>
+                <Input
+                  inputRef={docInputRef}
+                  type="file"
+                  onChange={handleDocChange}
+                  sx={{ display: "none" }}
+                  inputProps={{ accept: ".txt,.pdf" }}
+                />
+                <ColorBgButton
+                  startIcon={<CloudUploadIcon />}
+                  onClick={handleDocSelect}
+                  disabled={uploadingDoc}
+                >
+                  Select File
+                </ColorBgButton>
+                {selectedDoc && (
+                  <ColorBgButton
+                    onClick={handleDocUpload}
+                    disabled={uploadingDoc}
+                    variant="contained"
+                    color="primary"
+                  >
+                    {uploadingDoc ? "Uploading..." : "Upload"}
+                  </ColorBgButton>
+                )}
+              </Stack>
+            </Box>
+          </Paper>
+        </Stack>
+      </Box>
+    </AdminGuard>
   );
 }
