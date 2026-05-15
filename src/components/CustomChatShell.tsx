@@ -354,40 +354,40 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
               sx={{
                 width: "100%",
                 maxWidth: "900px",
-                px: 2,
-                mb: 1,
                 visibility: recordingState !== "idle" ? "visible" : "hidden",
               }}
             >
               <AudioWaveform ref={waveformRef} height={60} />
             </Box>
 
-            {message === "" && recordingState === "idle" ? (
-              <IconButton
-                sx={{ ml: 1 }}
-                color="primary"
-                onClick={handleMicClick}
-                disabled={isSending}
-              >
-                <MicIcon />
-              </IconButton>
-            ) : recordingState !== "idle" ? (
-              <IconButton
-                color="error"
-                onClick={handleMicClick}
-                disabled={recordingState === "processing"}
-              >
-                <StopIcon />
-              </IconButton>
-            ) : (
-              <IconButton
-                color="primary"
-                onClick={handleSend}
-                disabled={isSending}
-              >
-                <SendIcon />
-              </IconButton>
-            )}
+            <Box>
+              {message === "" && recordingState === "idle" ? (
+                <IconButton
+                  sx={{ ml: 1 }}
+                  color="success"
+                  onClick={handleMicClick}
+                  disabled={isSending}
+                >
+                  <MicIcon />
+                </IconButton>
+              ) : recordingState !== "idle" ? (
+                <IconButton
+                  color="error"
+                  onClick={handleMicClick}
+                  disabled={recordingState === "processing"}
+                >
+                  <StopIcon />
+                </IconButton>
+              ) : (
+                <IconButton
+                  color="primary"
+                  onClick={handleSend}
+                  disabled={isSending}
+                >
+                  <SendIcon />
+                </IconButton>
+              )}
+            </Box>
           </Box>
         </Box>
       </LiteCard>

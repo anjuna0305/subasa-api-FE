@@ -186,6 +186,11 @@ export default function SideBar({ services }: SideBarProps) {
                   >
                     <ListItemIcon
                       sx={[
+                        isActive(service.path)
+                          ? {
+                              color: theme.palette.primary.main,
+                            }
+                          : {},
                         {
                           minWidth: 0,
                           justifyContent: "center",

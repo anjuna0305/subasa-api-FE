@@ -151,6 +151,7 @@ export default function CustomChatbotListPage() {
               tooltip="Refresh"
               size="small"
               onClick={fetchChatbots}
+              color="primary"
             >
               <RefreshIcon fontSize="small" />
             </ColorBgIconButton>
@@ -254,10 +255,18 @@ export default function CustomChatbotListPage() {
             </Stack>
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2 }}>
-            <ColorBgButton onClick={handleCloseDialog} disabled={submitting}>
+            <ColorBgButton
+              variant="outlined"
+              onClick={handleCloseDialog}
+              disabled={submitting}
+            >
               Cancel
             </ColorBgButton>
-            <ColorBgButton onClick={handleSubmit} disabled={submitting}>
+            <ColorBgButton
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={submitting}
+            >
               {submitting ? "Creating..." : "Create"}
             </ColorBgButton>
           </DialogActions>

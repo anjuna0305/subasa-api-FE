@@ -19,6 +19,7 @@ import { API_ENDPOINTS } from "@/utils/api";
 import { useAlert } from "@/contexts/AlertContext";
 import { CustomChatbot } from "@/types/custom-chatbot";
 import AdminGuard from "@/components/AdminGuard";
+import nextConfig from "../../../../../../next.config";
 
 export default function CustomChatbotDetailPage() {
   const router = useRouter();
@@ -161,7 +162,7 @@ export default function CustomChatbotDetailPage() {
           : API_ENDPOINTS.CUSTOM_CHATBOT_PUBLISH(chatbotId);
 
       const response = await fetch(path, {
-        method: "PATCH",
+        method: "POST",
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to update");
@@ -231,7 +232,7 @@ export default function CustomChatbotDetailPage() {
                 <Typography>
                   <Typography
                     component="a"
-                    href={`/chat/${chatbot.url_path}`}
+                    href={`${nextConfig.basePath}/chat/${chatbot.url_path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{
@@ -353,6 +354,7 @@ export default function CustomChatbotDetailPage() {
                   startIcon={<CloudUploadIcon />}
                   onClick={handleFileSelect}
                   disabled={uploading}
+                  variant="outlined"
                 >
                   Select Image
                 </ColorBgButton>
@@ -416,6 +418,7 @@ export default function CustomChatbotDetailPage() {
                   startIcon={<CloudUploadIcon />}
                   onClick={handleDocSelect}
                   disabled={uploadingDoc}
+                  variant="outlined"
                 >
                   Select File
                 </ColorBgButton>

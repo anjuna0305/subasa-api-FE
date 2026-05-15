@@ -12,7 +12,7 @@ const ColorBgIconButton = forwardRef<
       </IconButton>
     </Tooltip>
   ) : (
-    <IconButton ref={ref} {...props}>
+    <IconButton ref={ref} {...props} color="success">
       {children}
     </IconButton>
   );
