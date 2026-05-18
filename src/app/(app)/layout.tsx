@@ -61,6 +61,12 @@ const adminServices: Service[] = [
     serviceCodeName: "admin-custom-chatbot",
     path: "/admin/custom-chatbot",
   },
+  {
+    id: 103,
+    serviceDisplayName: "Organization",
+    serviceCodeName: "organization",
+    path: "/admin/organizations",
+  },
 ];
 
 export default function AppLayout({

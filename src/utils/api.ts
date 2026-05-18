@@ -26,6 +26,12 @@ export const API_ENDPOINTS = {
     `${API_BASE_URL}/custom-chatbots/api/${urlPath}`,
   CUSTOM_CHATBOT_IMAGE: (imageName: string) =>
     `${API_BASE_URL}/custom-chatbots/images/${imageName}`,
+  CUSTOM_ORGANIZATION_LIST: `${API_BASE_URL}/orgs`,
+  CUSTOM_ORGANIZATION_DETAIL: (id: number) => `${API_BASE_URL}/orgs/${id}`,
+  ORGANIZATION_ACTIVATE: (id: number) => `${API_BASE_URL}/orgs/activate/${id}`,
+  ORGANIZATION_DEACTIVATE: (id: number) =>
+    `${API_BASE_URL}/orgs/deactivate/${id}`,
+
   ASR_TRANSCRIBE: `${API_BASE_URL}/voc-si/api/asr/transcribe`,
   TTS_GENERATE: `${API_BASE_URL}/voc-si/api/tts/voicebot-generate-audio`,
 };
