@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  // basePath: "/voc-si-test",
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH ?? "",
   // env: {
   //   NEXT_PUBLIC_BASE_PATH: "/voc-si-test",
   //   PORT: "7007",
