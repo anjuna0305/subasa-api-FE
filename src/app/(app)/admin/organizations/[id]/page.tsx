@@ -26,15 +26,14 @@ export default function OrganizationDetailPage() {
 
   const [org, setOrg] = useState<Organization | null>(null);
   const [loading, setLoading] = useState(true);
-  const [togglingPublish, setTogglingPublish] = useState(false);
+  const [togglingActive, setTogglingActive] = useState(false);
 
   const fetchOrganization = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        API_ENDPOINTS.CUSTOM_ORGANIZATION_DETAIL(orgId),
-        { credentials: "include" },
-      );
+      const response = await fetch(API_ENDPOINTS.ORGANIZATION_DETAIL(orgId), {
+        credentials: "include",
+      });
       if (!response.ok) throw new Error("Failed to fetch organization");
       const data: Organization = await response.json();
       setOrg(data);
@@ -50,7 +49,7 @@ export default function OrganizationDetailPage() {
   }, [fetchOrganization]);
 
   const handleToggleActivate = async () => {
-    setTogglingPublish(true);
+    setTogglingActive(true);
     try {
       const path =
         org && org.is_active
@@ -71,9 +70,9 @@ export default function OrganizationDetailPage() {
           : "Organization deactivated",
       );
     } catch {
-      addAlert("error", "Failed to update publish status");
+      addAlert("error", "Failed to update activation status");
     } finally {
-      setTogglingPublish(false);
+      setTogglingActive(false);
     }
   };
 
@@ -135,12 +134,12 @@ export default function OrganizationDetailPage() {
                 <ColorBgButton
                   size="small"
                   onClick={handleToggleActivate}
-                  disabled={togglingPublish}
+                  disabled={togglingActive}
                   variant="contained"
                   color={org?.is_active ? "warning" : "success"}
                   sx={{ ml: 1 }}
                 >
-                  {togglingPublish
+                  {togglingActive
                     ? "Updating..."
                     : org?.is_active
                       ? "deactivate"

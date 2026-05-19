@@ -153,7 +153,7 @@ export default function CustomChatShell({ chatbotData, heroImageUrl }: Props) {
         setIsSending(false);
       }
     },
-    [chatbotData.retrieval_key],
+    [chatbotData.url_path],
   );
 
   const handleSend = () => {

@@ -52,7 +52,7 @@ export default function OrganizationsPage() {
   const fetchOrganizations = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(API_ENDPOINTS.CUSTOM_ORGANIZATION_LIST, {
+      const response = await fetch(API_ENDPOINTS.ORGANIZATION_LIST, {
         credentials: "include",
       });
       if (!response.ok) {
@@ -86,7 +86,7 @@ export default function OrganizationsPage() {
 
     setSubmitting(true);
     try {
-      const response = await fetch(API_ENDPOINTS.CUSTOM_ORGANIZATION_LIST, {
+      const response = await fetch(API_ENDPOINTS.ORGANIZATION_LIST, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -173,8 +173,7 @@ export default function OrganizationsPage() {
               <TableHead>
                 <TableRow>
                   <TableCell>Name</TableCell>
-                  <TableCell>URL Path</TableCell>
-                  <TableCell>Published</TableCell>
+                  <TableCell>Activation state</TableCell>
                   <TableCell align="center">Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -191,8 +190,8 @@ export default function OrganizationsPage() {
                     <TableCell>{org.name}</TableCell>
                     <TableCell>
                       <Chip
-                        // label={org.is_publish ? "Published" : "Unpublished"}
-                        // color={org.is_publish ? "success" : "default"}
+                        label={org.is_active ? "Activated" : "Deactivated"}
+                        color={org.is_active ? "success" : "default"}
                         size="small"
                       />
                     </TableCell>
