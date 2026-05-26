@@ -20,6 +20,7 @@ import { useAlert } from "@/contexts/AlertContext";
 import { CustomChatbot } from "@/types/custom-chatbot";
 import AdminGuard from "@/components/AdminGuard";
 import nextConfig from "../../../../../../next.config";
+import { Organization } from "@/types/organizations";
 
 export default function CustomChatbotDetailPage() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export default function CustomChatbotDetailPage() {
   const { addAlert } = useAlert();
 
   const [chatbot, setChatbot] = useState<CustomChatbot | null>(null);
+  const [org, setOrg] = useState<Organization | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -35,8 +37,28 @@ export default function CustomChatbotDetailPage() {
   const [selectedDoc, setSelectedDoc] = useState<File | null>(null);
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [togglingPublish, setTogglingPublish] = useState(false);
+  const [togglingVisibility, setTogglingVisibility] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
+
+  const fetchOrganization = useCallback(
+    async (orgId: number) => {
+      setLoading(true);
+      try {
+        const response = await fetch(API_ENDPOINTS.ORGANIZATION_DETAIL(orgId), {
+          credentials: "include",
+        });
+        if (!response.ok) throw new Error("Failed to fetch organization");
+        const data: Organization = await response.json();
+        setOrg(data);
+      } catch {
+        addAlert("error", "Failed to load organiazation details");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [addAlert],
+  );
 
   const fetchChatbot = useCallback(async () => {
     setLoading(true);
@@ -48,12 +70,13 @@ export default function CustomChatbotDetailPage() {
       if (!response.ok) throw new Error("Failed to fetch chatbot");
       const data: CustomChatbot = await response.json();
       setChatbot(data);
+      if (chatbot?.organization_id) fetchOrganization(chatbot.organization_id);
     } catch {
       addAlert("error", "Failed to load chatbot details");
     } finally {
       setLoading(false);
     }
-  }, [chatbotId, addAlert]);
+  }, [chatbotId, addAlert, chatbot?.organization_id, fetchOrganization]);
 
   useEffect(() => {
     fetchChatbot();
@@ -179,6 +202,33 @@ export default function CustomChatbotDetailPage() {
     }
   };
 
+  const handleToggleVisibility = async () => {
+    setTogglingVisibility(true);
+    try {
+      // todo correct these paths
+      const path =
+        chatbot && chatbot.is_public
+          ? API_ENDPOINTS.CUSTOM_CHATBOT_PRIVATE(chatbotId)
+          : API_ENDPOINTS.CUSTOM_CHATBOT_PUBLIC(chatbotId);
+
+      const response = await fetch(path, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Failed to update");
+      const updated: CustomChatbot = await response.json();
+      setChatbot(updated);
+      addAlert(
+        "success",
+        updated.is_public ? "Chatbot is public now" : "Chatbot is private now",
+      );
+    } catch {
+      addAlert("error", "Failed to update publish visibility");
+    } finally {
+      setTogglingVisibility(false);
+    }
+  };
+
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
@@ -256,6 +306,14 @@ export default function CustomChatbotDetailPage() {
                   {chatbot.retrieval_key}
                 </Typography>
               </Box>
+              {org && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    Organization
+                  </Typography>
+                  <Typography>{org.name}</Typography>
+                </Box>
+              )}
               <Box
                 sx={{
                   display: "flex",
@@ -275,8 +333,8 @@ export default function CustomChatbotDetailPage() {
                   size="small"
                   onClick={handleTogglePublish}
                   disabled={togglingPublish}
-                  variant="contained"
-                  color={chatbot.is_publish ? "warning" : "success"}
+                  variant="outlined"
+                  // color={chatbot.is_publish ? "warning" : "success"}
                   sx={{ ml: 1 }}
                 >
                   {togglingPublish
@@ -284,6 +342,35 @@ export default function CustomChatbotDetailPage() {
                     : chatbot.is_publish
                       ? "Unpublish"
                       : "Publish"}
+                </ColorBgButton>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                }}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  Visibility
+                </Typography>
+                <Chip
+                  label={chatbot.is_public ? "Public" : "Private"}
+                  size="small"
+                />
+                <ColorBgButton
+                  size="small"
+                  onClick={handleToggleVisibility}
+                  disabled={togglingVisibility}
+                  variant="outlined"
+                  // color={chatbot.is_public ? "warning" : "success"}
+                  sx={{ ml: 1 }}
+                >
+                  {togglingVisibility
+                    ? "Updating..."
+                    : !chatbot.is_public
+                      ? "Make Public"
+                      : "Make Private"}
                 </ColorBgButton>
               </Box>
               <Box>

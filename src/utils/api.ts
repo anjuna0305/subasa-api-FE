@@ -20,6 +20,10 @@ export const API_ENDPOINTS = {
     `${API_BASE_URL}/custom-chatbots/publish/${id}`,
   CUSTOM_CHATBOT_UNPUBLISH: (id: number) =>
     `${API_BASE_URL}/custom-chatbots/unpublish/${id}`,
+  CUSTOM_CHATBOT_PUBLIC: (id: number) =>
+    `${API_BASE_URL}/custom-chatbots/make-public/${id}`,
+  CUSTOM_CHATBOT_PRIVATE: (id: number) =>
+    `${API_BASE_URL}/custom-chatbots/make-private/${id}`,
   CUSTOM_CHATBOT_BY_URL: (urlPath: string) =>
     `${API_BASE_URL}/custom-chatbots/by-url-path/${urlPath}`,
   CUSTOM_CHATBOT_API: (urlPath: string) =>

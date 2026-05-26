@@ -20,6 +20,9 @@ import {
   DialogActions,
   TextField,
   Stack,
+  Autocomplete,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -30,6 +33,8 @@ import { API_ENDPOINTS } from "@/utils/api";
 import { useAlert } from "@/contexts/AlertContext";
 import { CustomChatbot } from "@/types/custom-chatbot";
 import AdminGuard from "@/components/AdminGuard";
+import { Organization } from "@/types/organizations";
+import { setFlagsFromString } from "node:v8";
 
 type FormErrors = {
   chatbot_name?: string;
@@ -37,15 +42,26 @@ type FormErrors = {
   url_path?: string;
 };
 
-const INITIAL_FORM = {
+type FormState = {
+  chatbot_name: string;
+  description: string;
+  url_path: string;
+  organization_id: number | null;
+  is_public: boolean;
+};
+
+const INITIAL_FORM: FormState = {
   chatbot_name: "",
   description: "",
   url_path: "",
+  organization_id: null,
+  is_public: true,
 };
 
 export default function CustomChatbotListPage() {
   const router = useRouter();
   const [chatbots, setChatbots] = useState<CustomChatbot[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -71,9 +87,28 @@ export default function CustomChatbotListPage() {
     }
   }, [addAlert]);
 
+  const fetchOrganizations = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(API_ENDPOINTS.ORGANIZATION_LIST, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch organizations");
+      }
+      const data = await response.json();
+      setOrganizations(data);
+    } catch {
+      addAlert("error", "Failed to load custom organizations");
+    } finally {
+      setLoading(false);
+    }
+  }, [addAlert]);
+
   useEffect(() => {
     fetchChatbots();
-  }, [fetchChatbots]);
+    fetchOrganizations();
+  }, [fetchChatbots, fetchOrganizations]);
 
   function validate(): FormErrors {
     const errs: FormErrors = {};
@@ -106,6 +141,8 @@ export default function CustomChatbotListPage() {
           chatbot_name: form.chatbot_name.trim(),
           description: form.description.trim(),
           url_path: form.url_path.trim(),
+          organization_id: form.organization_id,
+          is_public: "true",
         }),
       });
       if (!response.ok) {
@@ -251,6 +288,49 @@ export default function CustomChatbotListPage() {
                 error={!!errors.url_path}
                 helperText={errors.url_path}
                 fullWidth
+              />
+              <Autocomplete
+                id="organization-select"
+                options={organizations}
+                autoHighlight
+                onChange={(event, selectedOrg: Organization | null) => {
+                  setForm((f) => ({
+                    ...f,
+                    organization_id: selectedOrg?.id || null,
+                  }));
+                }}
+                getOptionLabel={(option) => option.name}
+                renderOption={(props, option) => {
+                  const { key, ...optionProps } = props;
+                  return (
+                    <Box
+                      key={key}
+                      component="li"
+                      sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                      {...optionProps}
+                    >
+                      {/*{option.name} ({option.code}) +{option.phone}*/}
+                      {option.name}
+                    </Box>
+                  );
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Select organization" />
+                )}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={form.is_public}
+                    onChange={(e) => {
+                      setForm((f) => ({
+                        ...f,
+                        is_public: e.target.checked,
+                      }));
+                    }}
+                  />
+                }
+                label="Make chatbot available for public"
               />
             </Stack>
           </DialogContent>
