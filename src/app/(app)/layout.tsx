@@ -2,53 +2,52 @@
 
 import SideBar from "@/components/Sidebar";
 import { Box } from "@mui/material";
-import ServiceSelector from "@/components/ServiceSelector";
-import AuthGuard from "@/components/AuthGuard";
 import { isAdmin, useAuth } from "@/contexts/AuthContext";
 import { Service } from "@/types/service";
 // import { useIsMounted } from "@/hooks/useIsMounted";
 
-const generalServices: Service[] = [
+const publicServicesPrefix = "/p";
+const publicServices: Service[] = [
   {
     id: 1,
     serviceDisplayName: "Chatbot",
     serviceCodeName: "subasa-chatbot",
-    path: "/chat/chatbot",
+    path: publicServicesPrefix + "/chatbot",
   },
   {
     id: 2,
     serviceDisplayName: "ASR",
     serviceCodeName: "subasa-asr",
-    path: "/chat/asr",
+    path: publicServicesPrefix + "/asr",
   },
   {
     id: 3,
     serviceDisplayName: "TTS",
     serviceCodeName: "subasa-tts",
-    path: "/chat/tts",
+    path: publicServicesPrefix + "/tts",
   },
   {
     id: 4,
     serviceDisplayName: "Gov-chatbot",
     serviceCodeName: "goverment-chatbot",
-    path: "/chat/gov-chatbot",
+    path: publicServicesPrefix + "/gov-chatbot",
   },
   {
     id: 5,
     serviceDisplayName: "Make your own chatbot",
     serviceCodeName: "make-chatbot",
-    path: "/chat/make-chatbot",
+    path: publicServicesPrefix + "/make-chatbot",
   },
   {
     id: 6,
     serviceDisplayName: "Voice stream test",
     serviceCodeName: "voice-stream",
-    path: "/chat/voice-stream",
+    path: publicServicesPrefix + "/voice-stream",
   },
 ];
 
 const adminServices: Service[] = [
-  ...generalServices,
+  ...publicServices,
   {
     id: 101,
     serviceDisplayName: "Dashboard",
@@ -78,54 +77,29 @@ export default function AppLayout({
   // const isMounted = useIsMounted();
 
   const admin = isAdmin(role);
-  const services = admin ? adminServices : generalServices;
+  const services = admin ? adminServices : publicServices;
 
   return (
-    <AuthGuard>
-      <Box display={"flex"} sx={{ height: "100vh" }}>
-        <SideBar services={services} />
+    <Box display={"flex"} sx={{ height: "100vh" }}>
+      <SideBar services={services} />
+      <Box
+        sx={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Box
           sx={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
+            flex: 1,
+            overflow: "auto",
+            minHeight: 0,
           }}
         >
-          {!isAdmin && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                flexShrink: 0,
-                position: "absolute",
-              }}
-            >
-              <Box
-                sx={{
-                  alignItems: "center",
-                  width: "100%",
-                  px: 2,
-                }}
-              >
-                The Subasa
-              </Box>
-
-              <ServiceSelector services={generalServices} />
-            </Box>
-          )}
-
-          <Box
-            sx={{
-              flex: 1,
-              overflow: "auto",
-              minHeight: 0,
-            }}
-          >
-            {children}
-          </Box>
+          {children}
         </Box>
       </Box>
-    </AuthGuard>
+    </Box>
   );
 }

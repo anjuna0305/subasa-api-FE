@@ -2,20 +2,35 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
-export default function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
+interface Props {
+  roleValidators?: [(role: string) => boolean];
+  children: ReactNode;
+}
+
+export default function AuthGuard({ children, roleValidators }: Props) {
+  const { isAuthenticated, role } = useAuth();
   const router = useRouter();
   const redirected = useRef(false);
 
+  let roleAuth = true;
+
+  if (roleValidators && role) {
+    let tempAuth = false;
+    roleValidators.map((authFunc) => {
+      tempAuth = tempAuth || authFunc(role);
+    });
+    if (!tempAuth) roleAuth = false;
+  }
+
   useEffect(() => {
-    if (!isAuthenticated && !redirected.current) {
+    if (!roleAuth || (!isAuthenticated && !redirected.current)) {
       redirected.current = true;
       router.replace("/login");
     }
-  }, [isAuthenticated, router]);
-  useAuth;
+  }, [isAuthenticated, router, roleAuth]);
+
   if (!isAuthenticated) {
     return null;
   }

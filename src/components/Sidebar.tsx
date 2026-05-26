@@ -138,6 +138,18 @@ export default function SideBar({ services }: SideBarProps) {
           </DrawerHeader>
         ) : (
           <DrawerHeader>
+            <Box
+              sx={{
+                width: "100%",
+                px: 2,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Box sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
+                General user
+              </Box>
+            </Box>
             {open ? (
               <IconButton onClick={handleToggle}>
                 {theme.direction === "rtl" ? (
